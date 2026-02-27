@@ -1,0 +1,79 @@
+---
+// Hero Section – image slider with infinite loop + stats bar
+const images = [
+    "/1351306.webp",
+    "/323869.webp",
+    "/468739.webp",
+    "/1351306.webp", // clone of first — enables seamless loop
+];
+---
+
+<section id="hero" class="pt-24 pb-0 px-4 md:px-0 bg-slate-950">
+    <!-- Image Slider -->
+    <div
+        class="max-w-[2000px] mx-auto overflow-hidden relative md:rounded-3xl shadow-2xl"
+    >
+        <div
+            id="hero-carousel"
+            class="flex transition-transform duration-1000 ease-in-out"
+            style="transform: translateX(0%);"
+        >
+            {
+                images.map((img, index) => (
+                    <div
+                        class={`min-w-full relative aspect-[2.5/1] bg-slate-900 overflow-hidden ${index === 3 ? "hero-clone" : ""}`}
+                    >
+                        <img
+                            src={img}
+                            alt="Annafilah Hero Showcase"
+                            class="w-full h-full object-cover select-none"
+                            loading={index === 0 ? "eager" : "lazy"}
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<script>
+    function setupHeroCarousel() {
+        let currentSlide: number = 0;
+        const carousel = document.getElementById("hero-carousel");
+        const totalSlides = 3; // Actual unique slides (excluding clone)
+        let interval: any;
+
+        function updateSlide(index: number, animate: boolean = true) {
+            currentSlide = index;
+            if (carousel) {
+                carousel.style.transition = animate
+                    ? "transform 1000ms ease-in-out"
+                    : "none";
+                carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+                // After sliding to the clone, silently jump back to slide 0
+                if (currentSlide === totalSlides) {
+                    setTimeout(() => {
+                        currentSlide = 0;
+                        carousel.style.transition = "none";
+                        carousel.style.transform = `translateX(0%)`;
+                    }, 1000);
+                }
+            }
+        }
+
+        function startInterval() {
+            if (interval) clearInterval(interval);
+            interval = setInterval(() => updateSlide(currentSlide + 1), 5000);
+        }
+
+        if (carousel) {
+            updateSlide(0, false);
+            startInterval();
+        }
+    }
+
+    setupHeroCarousel();
+    document.addEventListener("astro:after-swap", setupHeroCarousel);
+</script>

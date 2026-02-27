@@ -1,0 +1,203 @@
+---
+import { allArtikel } from "../../../data/artikel";
+import ArtikelCard from "./ArtikelCard.astro";
+
+const totalSlides = allArtikel.length; // 5
+---
+
+<section id="artikel" class="py-24 bg-slate-950">
+    <div class="max-w-7xl mx-auto px-6">
+        <!-- Section Header -->
+        <div class="flex items-end justify-between mb-12">
+            <div>
+                <p
+                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+                >
+                    Wawasan & Inspirasi
+                </p>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white">
+                    Artikel Terbaru
+                </h2>
+            </div>
+            <a
+                href="/artikel"
+                class="hidden md:inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 text-sm font-semibold transition-colors"
+            >
+                Lihat Semua
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+
+        <!-- Carousel Viewport -->
+        <div class="relative overflow-hidden rounded-2xl">
+            <div
+                id="artikel-track"
+                class="flex gap-8 transition-transform duration-700 ease-in-out"
+                style="transform: translateX(0%);"
+            >
+                <!-- Slide Clone Akhir (untuk Loop Awal) -->
+                <ArtikelCard {...allArtikel[totalSlides - 1]} isClone />
+
+                {allArtikel.map((item) => <ArtikelCard {...item} />)}
+
+                <!-- Slide Clone Awal (untuk Loop Akhir) -->
+                <ArtikelCard {...allArtikel[0]} isClone />
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center justify-between mt-8">
+            <!-- Dots -->
+            <div class="flex gap-2">
+                {
+                    Array.from({ length: totalSlides }).map((_, i) => (
+                        <button
+                            class={`artikel-dot h-2 rounded-full transition-all duration-300 ${i === 0 ? "w-8 bg-indigo-500" : "w-2 bg-white/20"}`}
+                            data-index={i}
+                            aria-label={`Artikel ${i + 1}`}
+                        />
+                    ))
+                }
+            </div>
+
+            <!-- Arrows -->
+            <div class="flex gap-3">
+                <button
+                    id="artikel-prev"
+                    class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
+                    aria-label="Artikel sebelumnya"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button
+                    id="artikel-next"
+                    class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
+                    aria-label="Artikel selanjutnya"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function setupArtikelCarousel() {
+        const track = document.getElementById(
+            "artikel-track",
+        ) as HTMLElement | null;
+        const prevBtn = document.getElementById(
+            "artikel-prev",
+        ) as HTMLButtonElement | null;
+        const nextBtn = document.getElementById(
+            "artikel-next",
+        ) as HTMLButtonElement | null;
+        const dots =
+            document.querySelectorAll<HTMLButtonElement>(".artikel-dot");
+        const slides = document.querySelectorAll<HTMLElement>(".artikel-slide");
+
+        if (!track || !slides.length) return;
+
+        const totalReal = slides.length - 2;
+        let current = 1;
+        let isTransitioning = false;
+
+        function updateDots(realIndex: number) {
+            dots.forEach((dot, i) => {
+                const isActive = i === realIndex;
+                dot.classList.toggle("w-8", isActive);
+                dot.classList.toggle("w-2", !isActive);
+                dot.classList.toggle("bg-indigo-500", isActive);
+                dot.classList.toggle("bg-white/20", !isActive);
+            });
+        }
+
+        function goTo(index: number, smooth = true) {
+            if (!track || isTransitioning) return;
+
+            if (smooth) {
+                isTransitioning = true;
+                track.style.transition = "transform 0.7s ease-in-out";
+            } else {
+                track.style.transition = "none";
+            }
+
+            const offset = `calc(-${index} * (100% + 32px))`;
+            track.style.transform = `translateX(${offset})`;
+
+            let dotIndex = index - 1;
+            if (index === 0) dotIndex = totalReal - 1;
+            if (index === totalReal + 1) dotIndex = 0;
+            updateDots(dotIndex);
+
+            current = index;
+        }
+
+        track.addEventListener("transitionend", () => {
+            isTransitioning = false;
+            if (current === totalReal + 1) goTo(1, false);
+            if (current === 0) goTo(totalReal, false);
+        });
+
+        prevBtn?.addEventListener("click", () => goTo(current - 1));
+        nextBtn?.addEventListener("click", () => goTo(current + 1));
+
+        dots.forEach((dot) => {
+            dot.addEventListener("click", () => {
+                goTo(parseInt(dot.dataset.index ?? "0") + 1);
+            });
+        });
+
+        let autoPlay = setInterval(() => goTo(current + 1), 6000);
+        track.parentElement?.addEventListener("mouseenter", () =>
+            clearInterval(autoPlay),
+        );
+        track.parentElement?.addEventListener("mouseleave", () => {
+            autoPlay = setInterval(() => goTo(current + 1), 6000);
+        });
+
+        if (prevBtn) prevBtn.disabled = false;
+        if (nextBtn) nextBtn.disabled = false;
+
+        goTo(1, false);
+    }
+
+    setupArtikelCarousel();
+    document.addEventListener("astro:after-swap", setupArtikelCarousel);
+</script>

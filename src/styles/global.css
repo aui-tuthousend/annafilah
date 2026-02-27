@@ -1,0 +1,13 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: rgb(2 6 23);
+    /* slate-950 */
+    color: white;
+    -webkit-font-smoothing: antialiased;
+}

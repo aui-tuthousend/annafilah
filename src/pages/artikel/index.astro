@@ -1,0 +1,144 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { allArtikel } from "../../data/artikel";
+
+const categories = ["Semua", ...new Set(allArtikel.map((a) => a.category))];
+---
+
+<Layout
+    title="Artikel & Wawasan – Yayasan Annafilah"
+    description="Kumpulan artikel, panduan, dan wawasan bisnis dari tim Annafilah untuk membantu Anda mengambil keputusan lebih baik."
+>
+    <!-- Page Header -->
+    <section class="pt-36 pb-12 bg-slate-950 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="text-sm text-slate-500 mb-6 flex items-center gap-2">
+                <a href="/" class="hover:text-indigo-400 transition-colors">Beranda</a>
+                <span>/</span>
+                <span class="text-slate-300">Artikel</span>
+            </nav>
+
+            <p class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3">
+                Wawasan & Inspirasi
+            </p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">
+                Artikel & Panduan
+            </h1>
+            <p class="text-slate-400 text-lg max-w-2xl">
+                Kumpulan tulisan mendalam dari tim Annafilah untuk membantu
+                bisnis Anda tumbuh lebih cerdas.
+            </p>
+        </div>
+    </section>
+
+    <div class="border-t border-white/5 bg-slate-950"></div>
+
+    <!-- Filter + Grid -->
+    <section class="py-16 px-6 bg-slate-950 min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <!-- Category Filter -->
+            <div class="flex flex-wrap gap-2 mb-10" id="filter-bar">
+                {categories.map((cat, i) => (
+                    <button
+                        class={`filter-btn px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${
+                            i === 0
+                                ? "bg-indigo-600 border-indigo-600 text-white"
+                                : "bg-transparent border-white/10 text-slate-400 hover:border-indigo-500/50 hover:text-white"
+                        }`}
+                        data-filter={cat}
+                    >
+                        {cat}
+                    </button>
+                ))}
+            </div>
+
+            <!-- Artikel Grid -->
+            <div id="artikel-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {allArtikel.map((item) => (
+                    <div class="artikel-item" data-category={item.category}>
+                        <a
+                            href={`/artikel/${item.slug}`}
+                            class="group flex flex-col h-full border border-white/5 rounded-2xl overflow-hidden bg-slate-900 hover:border-indigo-500/30 hover:-translate-y-1 transition-all duration-300"
+                        >
+                            <!-- Thumbnail -->
+                            <div class="relative aspect-[16/9] overflow-hidden bg-slate-800">
+                                <img
+                                    src={item.image}
+                                    alt={item.title}
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    loading="lazy"
+                                />
+                                <div class="absolute top-3 left-3">
+                                    <span class="px-2.5 py-1 rounded-full bg-slate-950/80 text-indigo-400 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+                                        {item.category}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="flex flex-col flex-1 p-6">
+                                <h2 class="text-white font-bold text-lg leading-snug line-clamp-2 mb-3 group-hover:text-indigo-300 transition-colors">
+                                    {item.title}
+                                </h2>
+                                <p class="text-slate-400 text-sm leading-relaxed line-clamp-3 flex-1">
+                                    {item.excerpt}
+                                </p>
+                                <div class="flex items-center justify-between mt-5 pt-5 border-t border-white/5">
+                                    <div class="text-xs text-slate-500">
+                                        <span class="text-slate-300 font-medium">{item.author}</span>
+                                        &nbsp;·&nbsp; {item.readTime}
+                                    </div>
+                                    <span class="text-xs text-slate-500">{item.date}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                ))}
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-24 text-slate-500">
+                <p class="text-4xl mb-4">📭</p>
+                <p class="text-lg font-medium text-slate-400">
+                    Tidak ada artikel di kategori ini
+                </p>
+            </div>
+        </div>
+    </section>
+</Layout>
+
+<script>
+    function setupFilter() {
+        const buttons = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
+        const items = document.querySelectorAll<HTMLElement>(".artikel-item");
+        const emptyState = document.getElementById("empty-state");
+
+        buttons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const filter = btn.dataset.filter ?? "Semua";
+
+                buttons.forEach((b) => {
+                    b.classList.remove("bg-indigo-600", "border-indigo-600", "text-white");
+                    b.classList.add("bg-transparent", "border-white/10", "text-slate-400");
+                });
+                btn.classList.add("bg-indigo-600", "border-indigo-600", "text-white");
+                btn.classList.remove("bg-transparent", "border-white/10", "text-slate-400");
+
+                let visible = 0;
+                items.forEach((item) => {
+                    const match = filter === "Semua" || item.dataset.category === filter;
+                    item.style.display = match ? "" : "none";
+                    if (match) visible++;
+                });
+
+                if (emptyState) {
+                    emptyState.classList.toggle("hidden", visible > 0);
+                }
+            });
+        });
+    }
+
+    setupFilter();
+    document.addEventListener("astro:after-swap", setupFilter);
+</script>

@@ -1,0 +1,85 @@
+---
+// Komponen kartu berita kecil – untuk halaman listing /berita
+interface Props {
+    title: string;
+    date: string;
+    location: string;
+    image: string;
+    category: string;
+    slug: string;
+}
+
+const { title, date, location, image, category, slug } = Astro.props;
+---
+
+<a
+    href={`/berita/${slug}`}
+    class="group block bg-slate-900 border border-white/5 rounded-xl overflow-hidden hover:border-indigo-500/30 hover:-translate-y-1 transition-all duration-300"
+>
+    <!-- Thumbnail -->
+    <div class="relative aspect-[16/9] overflow-hidden bg-slate-800">
+        <img
+            src={image}
+            alt={title}
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 select-none"
+            loading="lazy"
+        />
+        <span
+            class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-indigo-600/90 backdrop-blur-sm text-white text-xs font-semibold uppercase tracking-wider"
+        >
+            {category}
+        </span>
+    </div>
+
+    <!-- Info -->
+    <div class="p-4">
+        <h3
+            class="text-white font-semibold text-sm leading-snug line-clamp-2 mb-3 group-hover:text-indigo-300 transition-colors"
+        >
+            {title}
+        </h3>
+        <div class="flex items-center gap-3 text-xs text-slate-500">
+            <span class="flex items-center gap-1">
+                <!-- Calendar icon -->
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    ></path>
+                </svg>
+                {date}
+            </span>
+            <span class="flex items-center gap-1">
+                <!-- Location icon -->
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    ></path>
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                {location}
+            </span>
+        </div>
+    </div>
+</a>

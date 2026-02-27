@@ -1,0 +1,176 @@
+---
+import NewsCard from "./NewsCard.astro";
+import { allNews } from "../../../data/news";
+
+const DESKTOP_PER_PAGE = 3;
+const totalPages = Math.ceil(allNews.length / DESKTOP_PER_PAGE); // = 2
+---
+
+<section id="berita" class="py-24 bg-slate-900/50">
+    <div class="max-w-7xl mx-auto px-6">
+        <!-- Section Header -->
+        <div class="flex items-end justify-between mb-12">
+            <div>
+                <p
+                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+                >
+                    Terbaru
+                </p>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white">
+                    Berita & Update
+                </h2>
+            </div>
+            <a
+                href="/berita"
+                class="hidden md:inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 text-sm font-semibold transition-colors"
+            >
+                Lihat Semua
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+
+        <!-- Carousel Viewport -->
+        <div class="relative overflow-hidden">
+            <div
+                id="news-track"
+                class="flex gap-4 transition-transform duration-700 ease-in-out"
+                style="transform: translateX(0%);"
+            >
+                {allNews.map((item) => <NewsCard {...item} />)}
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center justify-between mt-10">
+            <!-- Dots -->
+            <div class="flex gap-2">
+                {
+                    Array.from({ length: totalPages }).map((_, i) => (
+                        <button
+                            class={`news-dot h-2 rounded-full transition-all duration-300 ${i === 0 ? "w-8 bg-indigo-500" : "w-2 bg-white/20"}`}
+                            data-index={i}
+                            aria-label={`Halaman berita ${i + 1}`}
+                        />
+                    ))
+                }
+            </div>
+
+            <!-- Arrows -->
+            <div class="flex gap-3">
+                <button
+                    id="news-prev"
+                    class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Sebelumnya"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button
+                    id="news-next"
+                    class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
+                    aria-label="Selanjutnya"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function setupNewsCarousel() {
+        const track = document.getElementById(
+            "news-track",
+        ) as HTMLElement | null;
+        const prevBtn = document.getElementById(
+            "news-prev",
+        ) as HTMLButtonElement | null;
+        const nextBtn = document.getElementById(
+            "news-next",
+        ) as HTMLButtonElement | null;
+        const dots = document.querySelectorAll<HTMLButtonElement>(".news-dot");
+        const cards = document.querySelectorAll<HTMLElement>(".news-card");
+
+        if (!track || !cards.length) return;
+
+        const isDesktop = () => window.innerWidth >= 768;
+        const perPage = () => (isDesktop() ? 3 : 1);
+        const totalCards = cards.length;
+        let current = 0;
+
+        function maxPage() {
+            return totalCards - perPage();
+        }
+
+        function getCardWidth() {
+            return cards[0].offsetWidth + 16; // card width + gap-4 (16px)
+        }
+
+        function goTo(index: number) {
+            if (!track) return;
+            current = Math.max(0, Math.min(index, maxPage()));
+            track.style.transform = `translateX(-${current * getCardWidth()}px)`;
+
+            const dotIndex = Math.floor(current / perPage());
+            dots.forEach((dot, i) => {
+                dot.classList.toggle("w-8", i === dotIndex);
+                dot.classList.toggle("w-2", i !== dotIndex);
+                dot.classList.toggle("bg-indigo-500", i === dotIndex);
+                dot.classList.toggle("bg-white/20", i !== dotIndex);
+            });
+
+            if (prevBtn) prevBtn.disabled = current === 0;
+            if (nextBtn) nextBtn.disabled = current >= maxPage();
+        }
+
+        prevBtn?.addEventListener("click", () => goTo(current - 1));
+        nextBtn?.addEventListener("click", () => goTo(current + 1));
+        dots.forEach((dot) => {
+            dot.addEventListener("click", () => {
+                const pageIndex = parseInt(dot.dataset.index ?? "0");
+                goTo(pageIndex * perPage());
+            });
+        });
+
+        window.addEventListener("resize", () => goTo(0));
+        goTo(0);
+    }
+
+    setupNewsCarousel();
+    document.addEventListener("astro:after-swap", setupNewsCarousel);
+</script>

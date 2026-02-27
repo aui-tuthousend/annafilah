@@ -1,0 +1,146 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import NewsCardSmall from "./-components/NewsCardSmall.astro";
+import { allNews } from "../../data/news";
+
+const categories = ["Semua", ...new Set(allNews.map((n) => n.category))];
+---
+
+<Layout
+    title="Berita & Update – Yayasan Annafilah"
+    description="Ikuti perkembangan terbaru Yayasan Annafilah: kemitraan, penghargaan, event, dan berbagai pencapaian kami untuk Indonesia."
+>
+    <!-- Page Header -->
+    <section class="pt-36 pb-12 bg-slate-950 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="text-sm text-slate-500 mb-6 flex items-center gap-2">
+                <a href="/" class="hover:text-indigo-400 transition-colors"
+                    >Beranda</a
+                >
+                <span>/</span>
+                <span class="text-slate-300">Berita</span>
+            </nav>
+
+            <p
+                class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+            >
+                Terbaru
+            </p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">
+                Berita & Update
+            </h1>
+            <p class="text-slate-400 text-lg max-w-2xl">
+                Ikuti perkembangan terbaru kegiatan, kemitraan, dan pencapaian
+                Yayasan Annafilah.
+            </p>
+        </div>
+    </section>
+
+    <!-- Divider -->
+    <div class="border-t border-white/5 bg-slate-950"></div>
+
+    <!-- Filter + Grid -->
+    <section class="py-16 px-6 bg-slate-950 min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <!-- Category Filter -->
+            <div class="flex flex-wrap gap-2 mb-10" id="filter-bar">
+                {
+                    categories.map((cat, i) => (
+                        <button
+                            class={`filter-btn px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${
+                                i === 0
+                                    ? "bg-indigo-600 border-indigo-600 text-white"
+                                    : "bg-transparent border-white/10 text-slate-400 hover:border-indigo-500/50 hover:text-white"
+                            }`}
+                            data-filter={cat}
+                        >
+                            {cat}
+                        </button>
+                    ))
+                }
+            </div>
+
+            <!-- News Grid -->
+            <div
+                id="news-grid"
+                class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
+            >
+                {
+                    allNews.map((item) => (
+                        <div class="news-item" data-category={item.category}>
+                            <NewsCardSmall {...item} />
+                        </div>
+                    ))
+                }
+            </div>
+
+            <!-- Empty State (tersembunyi secara default) -->
+            <div
+                id="empty-state"
+                class="hidden text-center py-24 text-slate-500"
+            >
+                <p class="text-4xl mb-4">📭</p>
+                <p class="text-lg font-medium text-slate-400">
+                    Tidak ada berita di kategori ini
+                </p>
+            </div>
+        </div>
+    </section>
+</Layout>
+
+<script>
+    function setupFilter() {
+        const buttons =
+            document.querySelectorAll<HTMLButtonElement>(".filter-btn");
+        const items = document.querySelectorAll<HTMLElement>(".news-item");
+        const emptyState = document.getElementById("empty-state");
+
+        buttons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const filter = btn.dataset.filter ?? "Semua";
+
+                // Update active button style
+                buttons.forEach((b) => {
+                    b.classList.remove(
+                        "bg-indigo-600",
+                        "border-indigo-600",
+                        "text-white",
+                    );
+                    b.classList.add(
+                        "bg-transparent",
+                        "border-white/10",
+                        "text-slate-400",
+                    );
+                });
+                btn.classList.add(
+                    "bg-indigo-600",
+                    "border-indigo-600",
+                    "text-white",
+                );
+                btn.classList.remove(
+                    "bg-transparent",
+                    "border-white/10",
+                    "text-slate-400",
+                );
+
+                // Filter items
+                let visible = 0;
+                items.forEach((item) => {
+                    const match =
+                        filter === "Semua" || item.dataset.category === filter;
+                    item.style.display = match ? "" : "none";
+                    if (match) visible++;
+                });
+
+                // Show/hide empty state
+                if (emptyState) {
+                    emptyState.classList.toggle("hidden", visible > 0);
+                }
+            });
+        });
+    }
+
+    setupFilter();
+    document.addEventListener("astro:after-swap", setupFilter);
+</script>

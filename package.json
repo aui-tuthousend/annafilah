@@ -1,0 +1,25 @@
+{
+  "name": "annafilah",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.2.0",
+    "astro": "^5.17.1",
+    "daisyui": "^5.5.19",
+    "drizzle-orm": "^0.45.1",
+    "postgres": "^3.4.8",
+    "tailwindcss": "^4.2.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.9"
+  }
+}
