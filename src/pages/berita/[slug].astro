@@ -1,27 +1,31 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { allNews, getNewsBySlug } from "../../data/news";
-import type { NewsItem } from "../../data/news";
+import { getNewsBySlug, getAllNews } from "./-api/repository";
 
-// ─── Static Path Generation ──────────────────────────────────────────────────
-export function getStaticPaths() {
-    return allNews.map((item) => ({
-        params: { slug: item.slug },
-    }));
-}
+export const prerender = false;
 
-// ─── Props ───────────────────────────────────────────────────────────────────
+// ─── Data ─────────────────────────────────────────────────────────────────────
 const { slug } = Astro.params;
-const news = getNewsBySlug(slug as string);
+const news = await getNewsBySlug(slug as string);
 
 if (!news) {
     return Astro.redirect("/berita");
 }
 
 // Related articles (same category, exclude current)
+const allNews = await getAllNews({ isPublished: true, limit: 100 });
 const related = allNews
     .filter((n) => n.category === news.category && n.slug !== news.slug)
     .slice(0, 3);
+
+// Helper to format date
+const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(date);
+};
 ---
 
 <Layout
@@ -101,7 +105,7 @@ const related = allNews
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                         ></path>
                     </svg>
-                    {news.date}
+                    {formatDate(news.createdAt)}
                 </span>
                 <span class="flex items-center gap-1.5">
                     <svg
@@ -131,6 +135,43 @@ const related = allNews
             <p class="text-slate-300 text-xl leading-relaxed mb-8 font-light">
                 {news.excerpt}
             </p>
+
+            <!-- Image Gallery -->
+            {
+                news.images.length > 0 && (
+                    <div class="mb-12">
+                        <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent snap-x">
+                            {news.images.map((img) => (
+                                <div class="relative flex-none w-full md:w-2/3 aspect-video rounded-2xl overflow-hidden snap-center bg-slate-900 border border-white/5">
+                                    <img
+                                        src={img}
+                                        alt={news.title}
+                                        class="w-full h-full object-cover"
+                                        loading="lazy"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2 italic flex items-center gap-1.5">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-3 h-3"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                />
+                            </svg>
+                            Geser untuk melihat ke samping
+                        </p>
+                    </div>
+                )
+            }
 
             <!-- Main content -->
             <div
@@ -193,7 +234,7 @@ const related = allNews
                                         {item.title}
                                     </h3>
                                     <p class="text-slate-500 text-xs mt-2">
-                                        {item.date}
+                                        {formatDate(item.createdAt)}
                                     </p>
                                 </div>
                             </a>

@@ -1,0 +1,161 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getProgramBySlug } from "./-api/repository";
+import { getNewsByProgram } from "../berita/-api/repository";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const program = await getProgramBySlug(slug as string);
+
+if (!program) {
+    return Astro.redirect("/program");
+}
+
+// Berita terkait: ambil dari database berdasarkan programId
+const relatedNews = await getNewsByProgram(program.id, 3);
+
+// Helper to format date
+const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(date);
+};
+---
+
+<Layout
+    title={`${program.name} – Yayasan Annafilah`}
+    description={`Detail program ${program.name} dari Yayasan Annafilah.`}
+    ogImage={program.image}
+>
+    <!-- Hero -->
+    <div
+        class="relative w-full aspect-[2.5/1] md:aspect-[3/1] overflow-hidden bg-slate-900 mt-0"
+    >
+        <img
+            src={program.image}
+            alt={program.name}
+            class="w-full h-full object-cover"
+            loading="eager"
+        />
+        <div
+            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent"
+        >
+        </div>
+
+        <!-- Title Overlay -->
+        <div class="absolute bottom-0 left-0 right-0 pb-10 px-6">
+            <div class="max-w-4xl mx-auto">
+                <span
+                    class="inline-block px-3 py-1 rounded-full bg-indigo-600/90 text-white text-xs font-semibold uppercase tracking-widest mb-4 backdrop-blur-sm"
+                >
+                    Program Kerja
+                </span>
+                <h1
+                    class="text-3xl md:text-5xl font-extrabold text-white leading-tight"
+                >
+                    {program.name}
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <article class="py-16 px-6 bg-slate-950">
+        <div class="max-w-4xl mx-auto">
+            <!-- Breadcrumb -->
+            <nav class="text-sm text-slate-500 mb-10 flex items-center gap-2">
+                <a href="/" class="hover:text-indigo-400 transition-colors"
+                    >Beranda</a
+                >
+                <span>/</span>
+                <a
+                    href="/program"
+                    class="hover:text-indigo-400 transition-colors">Program</a
+                >
+                <span>/</span>
+                <span class="text-slate-300 truncate max-w-xs"
+                    >{program.name}</span
+                >
+            </nav>
+
+            <!-- Description HTML -->
+            <div
+                class="prose prose-invert prose-lg max-w-none
+                       prose-p:text-slate-400 prose-p:leading-relaxed
+                       prose-headings:text-white prose-h2:text-2xl prose-h2:font-bold prose-h2:mt-10 prose-h2:mb-4
+                       prose-strong:text-white
+                       prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline
+                       prose-li:text-slate-400
+                       prose-blockquote:not-italic prose-blockquote:border-indigo-500"
+                set:html={program.description}
+            />
+
+            <!-- Back button -->
+            <div class="mt-16 pt-8 border-t border-white/5">
+                <a
+                    href="/program"
+                    class="inline-flex items-center gap-2 text-indigo-400 font-semibold hover:text-indigo-300 transition-colors"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Kembali ke Semua Program
+                </a>
+            </div>
+        </div>
+    </article>
+
+    <!-- Related News -->
+    {
+        relatedNews.length > 0 && (
+            <section class="py-16 px-6 bg-slate-900/40 border-t border-white/5">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold text-white mb-8">
+                        Berita Terkait Program Ini
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                        {relatedNews.map((item) => (
+                            <a
+                                href={`/berita/${item.slug}`}
+                                class="group block bg-slate-900 border border-white/5 rounded-xl overflow-hidden hover:border-indigo-500/30 hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div class="relative aspect-[16/9] overflow-hidden bg-slate-800">
+                                    <img
+                                        src={item.image}
+                                        alt={item.title}
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        loading="lazy"
+                                    />
+                                </div>
+                                <div class="p-4">
+                                    <span class="text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+                                        {item.category}
+                                    </span>
+                                    <h3 class="text-white font-semibold text-sm leading-snug line-clamp-2 mt-1 group-hover:text-indigo-300 transition-colors">
+                                        {item.title}
+                                    </h3>
+                                    <p class="text-slate-500 text-xs mt-2">
+                                        {formatDate(item.createdAt)}
+                                    </p>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </section>
+        )
+    }
+</Layout>

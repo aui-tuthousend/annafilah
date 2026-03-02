@@ -1,8 +1,20 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { allArtikel } from "../../data/artikel";
+import { getAllArticles } from "./-api/repository";
 
-const categories = ["Semua", ...new Set(allArtikel.map((a) => a.category))];
+export const prerender = false;
+
+const articles = await getAllArticles({ isPublished: true, limit: 100 });
+const categories = ["Semua", ...new Set(articles.map((a) => a.category))];
+
+// Helper to format date
+const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(date);
+};
 ---
 
 <Layout
@@ -22,9 +34,31 @@ const categories = ["Semua", ...new Set(allArtikel.map((a) => a.category))];
             <p class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3">
                 Wawasan & Inspirasi
             </p>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">
-                Artikel & Panduan
-            </h1>
+            <div class="flex items-center justify-between gap-4 mb-4 flex-wrap">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white">
+                    Artikel & Inspirasi
+                </h1>
+                <a
+                    href="/artikel/create"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"
+                        ></path>
+                    </svg>
+                    Tambah Artikel
+                </a>
+            </div>
             <p class="text-slate-400 text-lg max-w-2xl">
                 Kumpulan tulisan mendalam dari tim Annafilah untuk membantu
                 bisnis Anda tumbuh lebih cerdas.
@@ -55,7 +89,7 @@ const categories = ["Semua", ...new Set(allArtikel.map((a) => a.category))];
 
             <!-- Artikel Grid -->
             <div id="artikel-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {allArtikel.map((item) => (
+                {articles.map((item) => (
                     <div class="artikel-item" data-category={item.category}>
                         <a
                             href={`/artikel/${item.slug}`}
@@ -87,9 +121,9 @@ const categories = ["Semua", ...new Set(allArtikel.map((a) => a.category))];
                                 <div class="flex items-center justify-between mt-5 pt-5 border-t border-white/5">
                                     <div class="text-xs text-slate-500">
                                         <span class="text-slate-300 font-medium">{item.author}</span>
-                                        &nbsp;·&nbsp; {item.readTime}
+                                        &nbsp;·&nbsp; {item.readingTime}
                                     </div>
-                                    <span class="text-xs text-slate-500">{item.date}</span>
+                                    <span class="text-xs text-slate-500">{formatDate(item.createdAt)}</span>
                                 </div>
                             </div>
                         </a>
@@ -98,10 +132,10 @@ const categories = ["Semua", ...new Set(allArtikel.map((a) => a.category))];
             </div>
 
             <!-- Empty State -->
-            <div id="empty-state" class="hidden text-center py-24 text-slate-500">
+            <div id="empty-state" class={`text-center py-24 text-slate-500 ${articles.length > 0 ? "hidden" : ""}`}>
                 <p class="text-4xl mb-4">📭</p>
                 <p class="text-lg font-medium text-slate-400">
-                    Tidak ada artikel di kategori ini
+                    {articles.length === 0 ? "Belum ada artikel yang diterbitkan." : "Tidak ada artikel di kategori ini."}
                 </p>
             </div>
         </div>

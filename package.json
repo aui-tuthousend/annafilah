@@ -12,14 +12,19 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@astrojs/node": "^9.5.4",
     "@tailwindcss/vite": "^4.2.0",
     "astro": "^5.17.1",
     "daisyui": "^5.5.19",
     "drizzle-orm": "^0.45.1",
     "postgres": "^3.4.8",
-    "tailwindcss": "^4.2.0"
+    "sharp": "^0.34.5",
+    "tailwindcss": "^4.2.0",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@types/sharp": "^0.32.0",
     "drizzle-kit": "^0.31.9"
   }
 }

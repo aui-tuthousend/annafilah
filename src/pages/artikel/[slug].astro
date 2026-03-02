@@ -1,26 +1,31 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { allArtikel, getArtikelBySlug } from "../../data/artikel";
+import { getArticleBySlug, getAllArticles } from "./-api/repository";
 
-// ─── Static Path Generation ───────────────────────────────────────────────────
-export function getStaticPaths() {
-    return allArtikel.map((item) => ({
-        params: { slug: item.slug },
-    }));
-}
+export const prerender = false;
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const { slug } = Astro.params;
-const artikel = getArtikelBySlug(slug as string);
+const artikel = await getArticleBySlug(slug as string);
 
 if (!artikel) {
     return Astro.redirect("/artikel");
 }
 
-// Artikel terkait: kategori sama, bukan artikel ini sendiri
-const related = allArtikel
+// Artikel terkait: kategori sama, bukan artikel ini sendiri (ambil dari DB)
+const allArticles = await getAllArticles({ isPublished: true, limit: 100 });
+const related = allArticles
     .filter((a) => a.category === artikel.category && a.slug !== artikel.slug)
     .slice(0, 3);
+
+// Helper to format date
+const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(date);
+};
 ---
 
 <Layout
@@ -121,7 +126,7 @@ const related = allArtikel
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                         ></path>
                     </svg>
-                    {artikel.date}
+                    {formatDate(artikel.createdAt)}
                 </span>
 
                 <!-- Read time -->
@@ -140,7 +145,7 @@ const related = allArtikel
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                         ></path>
                     </svg>
-                    {artikel.readTime} baca
+                    {artikel.readingTime} baca
                 </span>
             </div>
 
@@ -223,7 +228,7 @@ const related = allArtikel
                                         {item.title}
                                     </h3>
                                     <p class="text-slate-500 text-xs mt-2">
-                                        {item.author} · {item.readTime}
+                                        {item.author} · {item.readingTime}
                                     </p>
                                 </div>
                             </a>

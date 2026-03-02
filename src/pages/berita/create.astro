@@ -1,0 +1,734 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout
+    title="Tambah Berita – Annafilah"
+    description="Form untuk membuat berita baru di Yayasan Annafilah."
+>
+    <div class="min-h-screen bg-slate-950 pt-28 pb-20 px-6">
+        <div class="max-w-3xl mx-auto">
+            <!-- Header -->
+            <div class="mb-10">
+                <nav
+                    class="text-sm text-slate-500 mb-6 flex items-center gap-2"
+                >
+                    <a href="/" class="hover:text-indigo-400 transition-colors"
+                        >Beranda</a
+                    >
+                    <span>/</span>
+                    <a
+                        href="/berita"
+                        class="hover:text-indigo-400 transition-colors"
+                        >Berita</a
+                    >
+                    <span>/</span>
+                    <span class="text-slate-300">Tambah Berita</span>
+                </nav>
+                <p
+                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-2"
+                >
+                    Manajemen Konten
+                </p>
+                <h1 class="text-4xl font-extrabold text-white">
+                    Tambah Berita Baru
+                </h1>
+                <p class="text-slate-400 mt-2">
+                    Isi semua field yang diperlukan untuk mempublikasikan
+                    berita.
+                </p>
+            </div>
+
+            <!-- Alert area -->
+            <div
+                id="form-alert"
+                class="hidden mb-6 p-4 rounded-xl text-sm font-medium"
+            >
+            </div>
+
+            <!-- Form -->
+            <form id="create-news-form" novalidate class="space-y-6">
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        Judul Berita <span class="text-red-400">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        required
+                        maxlength="100"
+                        placeholder="Tulis judul berita yang menarik..."
+                        class="form-input"
+                    />
+                    <p class="form-hint text-right">
+                        <span id="title-count">0</span>/100
+                    </p>
+                </div>
+
+                <!-- Excerpt -->
+                <div class="form-group">
+                    <label for="excerpt" class="form-label">
+                        Ringkasan <span class="text-red-400">*</span>
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(ditampilkan di listing)</span
+                        >
+                    </label>
+                    <textarea
+                        id="excerpt"
+                        name="excerpt"
+                        required
+                        maxlength="300"
+                        rows="3"
+                        placeholder="Tuliskan ringkasan singkat berita ini..."
+                        class="form-input resize-none"></textarea>
+                    <p class="form-hint text-right">
+                        <span id="excerpt-count">0</span>/300
+                    </p>
+                </div>
+
+                <!-- Category + Author + Location -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="form-group">
+                        <label for="category" class="form-label">
+                            Kategori <span class="text-red-400">*</span>
+                        </label>
+                        <select
+                            id="category"
+                            name="category"
+                            required
+                            class="form-input"
+                        >
+                            <option value="" disabled selected
+                                >Pilih kategori...</option
+                            >
+                            <option value="Kemitraan">Kemitraan</option>
+                            <option value="Penghargaan">Penghargaan</option>
+                            <option value="Event">Event</option>
+                            <option value="Program">Program</option>
+                            <option value="Pengumuman">Pengumuman</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="author" class="form-label">
+                            Penulis <span class="text-red-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="author"
+                            name="author"
+                            required
+                            placeholder="Nama penulis..."
+                            class="form-input"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="location" class="form-label">
+                            Lokasi <span class="text-red-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="location"
+                            name="location"
+                            required
+                            placeholder="Contoh: Rumah Tahfidz"
+                            class="form-input"
+                        />
+                    </div>
+                </div>
+
+                <!-- Program (optional) -->
+                <div class="form-group">
+                    <label for="programId" class="form-label">
+                        Program Terkait
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(opsional)</span
+                        >
+                    </label>
+                    <select id="programId" name="programId" class="form-input">
+                        <option value="">— Tidak dikaitkan ke program —</option>
+                    </select>
+                    <p class="form-hint">
+                        Pilih program jika berita ini merupakan bagian dari
+                        program kerja.
+                    </p>
+                </div>
+
+                <!-- Gambar Berita (Multiple) -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Gambar Berita <span class="text-red-400">*</span>
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(gambar pertama = cover)</span
+                        >
+                    </label>
+
+                    <!-- Upload Drop Zone -->
+                    <div id="upload-zone" class="relative cursor-pointer">
+                        <input
+                            type="file"
+                            id="image"
+                            name="images"
+                            accept="image/*"
+                            multiple
+                            class="sr-only"
+                        />
+                        <div
+                            id="drop-ui"
+                            class="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-2xl p-10 bg-slate-900/40 hover:border-indigo-500/50 hover:bg-slate-900/60 transition-all duration-300"
+                        >
+                            <div
+                                class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4 transition-transform duration-300"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-8 h-8 text-indigo-400"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    ></path>
+                                </svg>
+                            </div>
+                            <p class="text-white font-semibold">
+                                Klik atau drag &amp; drop gambar
+                            </p>
+                            <p class="text-slate-500 text-sm mt-1">
+                                PNG, JPG atau WebP &mdash; Bisa pilih banyak
+                                sekaligus
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Image Grid Preview -->
+                    <div id="img-grid" class="hidden mt-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs text-slate-400">
+                                Klik gambar lain untuk jadikan cover &middot;
+                                Klik &times; untuk hapus
+                            </p>
+                            <button
+                                type="button"
+                                id="btn-add-more"
+                                class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+                                >+ Tambah gambar</button
+                            >
+                        </div>
+                        <div
+                            id="img-grid-items"
+                            class="grid grid-cols-3 sm:grid-cols-4 gap-3"
+                        >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="form-group">
+                    <label for="content" class="form-label">
+                        Konten Berita <span class="text-red-400">*</span>
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(mendukung HTML)</span
+                        >
+                    </label>
+
+                    <!-- HTML Shortcut Buttons -->
+                    <div
+                        class="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-900/50 border border-white/5 mb-1"
+                    >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="p"
+                            title="Paragraph (Alinea Baru)">P</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="br"
+                            title="Line Break (Garis Baru)">BR</button
+                        >
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button
+                            type="button"
+                            class="html-tag-btn font-bold"
+                            data-tag="strong"
+                            title="Bold (Tebal)">B</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn italic"
+                            data-tag="em"
+                            title="Italic (Miring)">I</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn underline"
+                            data-tag="u"
+                            title="Underline (Garis Bawah)">U</button
+                        >
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="h3"
+                            title="Heading 3 (Sub-judul)">H3</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="ul"
+                            title="Unordered List (Daftar)">UL</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="li"
+                            title="List Item (Poin Daftar)">LI</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn text-lg leading-none"
+                            data-tag="blockquote"
+                            title="Quote (Kutipan)">“</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="a"
+                            title="Link (Tautan)">Link</button
+                        >
+                    </div>
+
+                    <textarea
+                        id="content"
+                        name="content"
+                        required
+                        rows="12"
+                        placeholder="<p>Tulis konten berita di sini...</p>"
+                        class="form-input resize-y font-mono text-sm"
+                    ></textarea>
+                </div>
+
+                <!-- Publish Toggle -->
+                <!-- <div
+                    class="flex items-center justify-between p-5 rounded-2xl border border-white/10 bg-slate-900/60"
+                >
+                    <div>
+                        <p class="text-white font-semibold">Status Publikasi</p>
+                        <p class="text-slate-400 text-sm mt-0.5">
+                            Aktifkan untuk langsung mem-publish berita ini.
+                        </p>
+                    </div>
+                    <label
+                        class="relative inline-flex items-center cursor-pointer"
+                    >
+                        <input
+                            type="checkbox"
+                            id="isPublished"
+                            name="isPublished"
+                            class="sr-only peer"
+                            checked
+                        />
+                        <div
+                            class="w-12 h-6 bg-slate-700 peer-focus:ring-2 peer-focus:ring-indigo-500 rounded-full peer peer-checked:after:translate-x-6 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
+                        >
+                        </div>
+                    </label>
+                </div> -->
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 pt-2">
+                    <button
+                        type="submit"
+                        id="btn-submit"
+                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span id="btn-submit-text">Publikasikan Berita</span>
+                    </button>
+                    <a
+                        href="/berita"
+                        class="px-6 py-3.5 rounded-xl border border-white/10 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-base transition-colors"
+                    >
+                        Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    @reference "../../styles/global.css";
+    .form-group {
+        @apply flex flex-col gap-2;
+    }
+    .form-label {
+        @apply text-sm font-semibold text-slate-200;
+    }
+    .form-input {
+        @apply w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+               transition-all duration-200;
+    }
+    .form-hint {
+        @apply text-xs text-slate-500;
+    }
+    .form-input.error {
+        @apply border-red-500/70 focus:ring-red-500;
+    }
+    .html-tag-btn {
+        @apply px-2.5 py-1 text-[10px] font-bold rounded bg-slate-800 text-slate-400 border border-white/5 
+               hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all active:scale-95;
+    }
+</style>
+
+<script>
+    // ── Load programs into dropdown ────────────────────────────────────────────
+    const programSelect = document.getElementById(
+        "programId",
+    ) as HTMLSelectElement;
+    fetch("/api/program?published=true&limit=100")
+        .then((r) => r.json())
+        .then(({ data }) => {
+            if (!programSelect || !Array.isArray(data)) return;
+            data.forEach((p: { id: string; name: string }) => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = p.name;
+                programSelect.appendChild(opt);
+            });
+        })
+        .catch(() => {
+            /* silently ignore */
+        });
+
+    const titleInput = document.getElementById("title") as HTMLInputElement;
+    const titleCount = document.getElementById("title-count");
+    const excerptEl = document.getElementById("excerpt") as HTMLTextAreaElement;
+    const excerptCount = document.getElementById("excerpt-count");
+    const imgInput = document.getElementById("image") as HTMLInputElement;
+    const uploadZone = document.getElementById("upload-zone");
+    const dropUi = document.getElementById("drop-ui");
+    const imgGrid = document.getElementById("img-grid");
+    const imgGridItems = document.getElementById("img-grid-items");
+    const btnAddMore = document.getElementById("btn-add-more");
+    const form = document.getElementById("create-news-form") as HTMLFormElement;
+    const alertEl = document.getElementById("form-alert");
+    const submitBtn = document.getElementById(
+        "btn-submit",
+    ) as HTMLButtonElement;
+    const submitText = document.getElementById("btn-submit-text");
+
+    // Tracks selected files — index 0 is always the cover
+    let selectedFiles: File[] = [];
+
+    // ── Slug helpers ──────────────────────────────────────────────────────────
+    function toSlug(str: string): string {
+        return str
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9\s-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+    }
+
+    titleInput?.addEventListener("input", () => {
+        if (titleCount)
+            titleCount.textContent = String(titleInput.value.length);
+    });
+
+    excerptEl?.addEventListener("input", () => {
+        if (excerptCount)
+            excerptCount.textContent = String(excerptEl.value.length);
+    });
+
+    // ── Image Grid Renderer ───────────────────────────────────────────────────
+    function renderGrid() {
+        if (!imgGridItems) return;
+
+        if (selectedFiles.length === 0) {
+            imgGrid?.classList.add("hidden");
+            dropUi?.classList.remove("opacity-40");
+            return;
+        }
+
+        imgGrid?.classList.remove("hidden");
+        dropUi?.classList.add("opacity-40");
+        imgGridItems.innerHTML = "";
+
+        selectedFiles.forEach((file, index) => {
+            const url = URL.createObjectURL(file);
+            const isCover = index === 0;
+
+            const wrapper = document.createElement("div");
+            wrapper.className = [
+                "relative group cursor-pointer rounded-xl overflow-hidden aspect-square bg-slate-800",
+                isCover ? "ring-2 ring-indigo-500" : "",
+            ].join(" ");
+            wrapper.title = isCover
+                ? "Cover (gambar utama)"
+                : "Klik untuk jadikan cover";
+
+            // Thumbnail
+            const img = document.createElement("img");
+            img.src = url;
+            img.alt = file.name;
+            img.className =
+                "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 select-none";
+            wrapper.appendChild(img);
+
+            // Cover badge
+            if (isCover) {
+                const badge = document.createElement("div");
+                badge.className =
+                    "absolute top-2 left-2 px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg";
+                badge.textContent = "Cover";
+                wrapper.appendChild(badge);
+            }
+
+            // Hover overlay
+            const overlay = document.createElement("div");
+            overlay.className =
+                "absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center";
+            if (!isCover) {
+                const label = document.createElement("span");
+                label.className =
+                    "opacity-0 group-hover:opacity-100 text-white text-xs font-bold text-center px-2 transition-opacity";
+                label.textContent = "Jadikan Cover";
+                overlay.appendChild(label);
+            }
+            wrapper.appendChild(overlay);
+
+            // ✕ Remove button
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.className =
+                "absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-400 text-white text-xs font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg";
+            removeBtn.textContent = "✕";
+            removeBtn.title = "Hapus gambar";
+            removeBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                URL.revokeObjectURL(url);
+                selectedFiles.splice(index, 1);
+                renderGrid();
+            });
+            wrapper.appendChild(removeBtn);
+
+            // Click to promote as cover
+            if (!isCover) {
+                wrapper.addEventListener("click", () => {
+                    const [moved] = selectedFiles.splice(index, 1);
+                    selectedFiles.unshift(moved);
+                    renderGrid();
+                });
+            }
+
+            imgGridItems.appendChild(wrapper);
+        });
+    }
+
+    // ── File selection ────────────────────────────────────────────────────────
+    function addFiles(files: FileList | null) {
+        if (!files) return;
+        const valid = Array.from(files).filter((f) =>
+            f.type.startsWith("image/"),
+        );
+        selectedFiles = [...selectedFiles, ...valid];
+        renderGrid();
+    }
+
+    imgInput?.addEventListener("change", (e) => {
+        addFiles((e.target as HTMLInputElement).files);
+        imgInput.value = "";
+    });
+
+    uploadZone?.addEventListener("click", (e) => {
+        // only open picker if clicking the dropzone itself, not btn-add-more
+        if ((e.target as HTMLElement).id === "btn-add-more") return;
+        if (selectedFiles.length === 0) imgInput?.click();
+    });
+
+    btnAddMore?.addEventListener("click", () => imgInput?.click());
+
+    // Drag & drop
+    uploadZone?.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropUi?.classList.add("!border-indigo-500/60", "!bg-slate-900/70");
+    });
+    uploadZone?.addEventListener("dragleave", () => {
+        dropUi?.classList.remove("!border-indigo-500/60", "!bg-slate-900/70");
+    });
+    uploadZone?.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropUi?.classList.remove("!border-indigo-500/60", "!bg-slate-900/70");
+        addFiles((e as DragEvent).dataTransfer?.files ?? null);
+    });
+
+    // ── Alert ─────────────────────────────────────────────────────────────────
+    function showAlert(msg: string, type: "success" | "error") {
+        if (!alertEl) return;
+        alertEl.textContent = msg;
+        alertEl.className =
+            type === "success"
+                ? "mb-6 p-4 rounded-xl text-sm font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                : "mb-6 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400";
+    }
+
+    // ── Submit ────────────────────────────────────────────────────────────────
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!alertEl) return;
+        alertEl.className = "hidden mb-6 p-4 rounded-xl text-sm font-medium";
+
+        const raw = new FormData(form);
+        const title = (raw.get("title") as string).trim();
+        const slug = toSlug(title);
+
+        if (!title) {
+            showAlert("Judul wajib diisi.", "error");
+            titleInput.focus();
+            return;
+        }
+        if (selectedFiles.length === 0) {
+            showAlert("Minimal satu gambar wajib diupload.", "error");
+            return;
+        }
+
+        // Rebuild FormData with ordered images (index 0 = cover)
+        const payload = new FormData();
+        payload.append("slug", slug);
+        payload.append("title", (raw.get("title") as string).trim());
+        payload.append("excerpt", (raw.get("excerpt") as string).trim());
+        payload.append("category", (raw.get("category") as string).trim());
+        payload.append("author", (raw.get("author") as string).trim());
+        payload.append("location", (raw.get("location") as string).trim());
+        payload.append("content", (raw.get("content") as string).trim());
+        const programIdVal = (raw.get("programId") as string)?.trim();
+        if (programIdVal) payload.append("programId", programIdVal);
+        const isPublishedInput = document.getElementById(
+            "isPublished",
+        ) as HTMLInputElement | null;
+        payload.append(
+            "isPublished",
+            isPublishedInput
+                ? isPublishedInput.checked
+                    ? "true"
+                    : "false"
+                : "true",
+        );
+        // Append all images in order — server uses index 0 as cover
+        selectedFiles.forEach((file) => payload.append("images", file));
+
+        submitBtn.disabled = true;
+        if (submitText) submitText.textContent = "Menyimpan...";
+
+        try {
+            const res = await fetch("/api/berita", {
+                method: "POST",
+                body: payload,
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                showAlert("✓ Berita berhasil dipublikasikan!", "success");
+                form.reset();
+                selectedFiles = [];
+                renderGrid();
+                if (titleCount) titleCount.textContent = "0";
+                if (excerptCount) excerptCount.textContent = "0";
+                setTimeout(() => {
+                    window.location.href = "/berita";
+                }, 1500);
+            } else {
+                showAlert(result.error ?? "Gagal menyimpan berita.", "error");
+            }
+        } catch {
+            showAlert("Terjadi kesalahan jaringan. Coba lagi.", "error");
+        } finally {
+            submitBtn.disabled = false;
+            if (submitText) submitText.textContent = "Publikasikan Berita";
+        }
+    });
+
+    // ── Content Tag Shortcuts ────────────────────────────────────────────────
+    const contentTextarea = document.getElementById(
+        "content",
+    ) as HTMLTextAreaElement;
+    const tagButtons = document.querySelectorAll(".html-tag-btn");
+
+    tagButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const tag = (btn as HTMLElement).dataset.tag;
+            if (!tag || !contentTextarea) return;
+
+            const start = contentTextarea.selectionStart;
+            const end = contentTextarea.selectionEnd;
+            const text = contentTextarea.value;
+            const selectedText = text.substring(start, end);
+
+            let insertion = "";
+            let newCursorPos = start;
+
+            if (tag === "br") {
+                insertion = "<br>\n";
+                newCursorPos = start + insertion.length;
+            } else if (tag === "a") {
+                const url = prompt("Masukkan URL link:", "https://");
+                if (url === null) return; // Cancelled
+                insertion = `<a href="${url}" target="_blank" class="text-indigo-400 hover:underline"> ${selectedText || "link"} </a>`;
+                newCursorPos = start + insertion.length;
+            } else if (tag === "ul") {
+                insertion = `<ul>\n  <li>${selectedText || "Item 1"}</li>\n  <li>Item 2</li>\n</ul>`;
+                newCursorPos = start + insertion.length;
+            } else if (tag === "p") {
+                insertion = `<p>${selectedText}</p>\n`;
+                newCursorPos = start + insertion.length;
+            } else {
+                insertion = `<${tag}>${selectedText}</${tag}>`;
+                newCursorPos = start + tag.length + 2 + selectedText.length;
+            }
+
+            contentTextarea.value =
+                text.substring(0, start) + insertion + text.substring(end);
+
+            // Focus back and set cursor
+            contentTextarea.focus();
+            contentTextarea.setSelectionRange(newCursorPos, newCursorPos);
+
+            // Trigger input event to clear error class if any
+            contentTextarea.dispatchEvent(new Event("input"));
+        });
+    });
+
+    // Clear error class on re-input
+    document
+        .querySelectorAll<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >(".form-input")
+        .forEach((el) => {
+            el.addEventListener("input", () => el.classList.remove("error"));
+            el.addEventListener("change", () => el.classList.remove("error"));
+        });
+</script>

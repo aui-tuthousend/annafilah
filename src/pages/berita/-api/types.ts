@@ -11,7 +11,9 @@ export interface CreateNewsDto {
     content: string;
     category: string;
     author: string;
+    location: string;
     image: string;
+    programId?: string | null;   // optional association to a program
     isPublished?: boolean;
 }
 
@@ -31,7 +33,10 @@ export interface NewsResponse {
     content: string;
     category: string;
     author: string;
+    location: string;
     image: string;
+    images: string[];
+    programId: string | null;
     isPublished: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -45,7 +50,9 @@ export interface NewsPreview {
     excerpt: string;
     category: string;
     author: string;
+    location: string;
     image: string;
+    programId: string | null;
     createdAt: Date;
 }
 
@@ -53,6 +60,7 @@ export interface NewsPreview {
 
 export interface ListNewsQuery {
     category?: string;
+    programId?: string;      // filter by associated program
     isPublished?: boolean;
     limit?: number;
     offset?: number;

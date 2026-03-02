@@ -1,8 +1,18 @@
 ---
-import { allArtikel } from "../../../data/artikel";
+import { getAllArticles } from "../../artikel/-api/repository";
 import ArtikelCard from "./ArtikelCard.astro";
 
-const totalSlides = allArtikel.length; // 5
+const articles = await getAllArticles({ isPublished: true, limit: 5 });
+const totalSlides = articles.length;
+
+// Helper to format date
+const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(date);
+};
 ---
 
 <section id="artikel" class="py-24 bg-slate-950">
@@ -40,80 +50,109 @@ const totalSlides = allArtikel.length; // 5
             </a>
         </div>
 
-        <!-- Carousel Viewport -->
-        <div class="relative overflow-hidden rounded-2xl">
-            <div
-                id="artikel-track"
-                class="flex gap-8 transition-transform duration-700 ease-in-out"
-                style="transform: translateX(0%);"
-            >
-                <!-- Slide Clone Akhir (untuk Loop Awal) -->
-                <ArtikelCard {...allArtikel[totalSlides - 1]} isClone />
+        {
+            totalSlides > 0 ? (
+                <div class="flex flex-col">
+                    <!-- Carousel Viewport -->
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <div
+                            id="artikel-track"
+                            class="flex gap-8 transition-transform duration-700 ease-in-out"
+                            style="transform: translateX(0%);"
+                        >
+                            <!-- Slide Clone Akhir (untuk Loop Awal) -->
+                            <ArtikelCard
+                                {...articles[totalSlides - 1]}
+                                image={articles[totalSlides - 1].image ?? ""}
+                                date={formatDate(articles[totalSlides - 1].createdAt)}
+                                readTime={articles[totalSlides - 1].readingTime}
+                                isClone
+                            />
 
-                {allArtikel.map((item) => <ArtikelCard {...item} />)}
+                            {articles.map((item) => (
+                                <ArtikelCard
+                                    {...item}
+                                    image={item.image ?? ""}
+                                    date={formatDate(item.createdAt)}
+                                    readTime={item.readingTime}
+                                />
+                            ))}
 
-                <!-- Slide Clone Awal (untuk Loop Akhir) -->
-                <ArtikelCard {...allArtikel[0]} isClone />
-            </div>
-        </div>
+                            <!-- Slide Clone Awal (untuk Loop Akhir) -->
+                            <ArtikelCard
+                                {...articles[0]}
+                                image={articles[0].image ?? ""}
+                                date={formatDate(articles[0].createdAt)}
+                                readTime={articles[0].readingTime}
+                                isClone
+                            />
+                        </div>
+                    </div>
 
-        <!-- Controls -->
-        <div class="flex items-center justify-between mt-8">
-            <!-- Dots -->
-            <div class="flex gap-2">
-                {
-                    Array.from({ length: totalSlides }).map((_, i) => (
-                        <button
-                            class={`artikel-dot h-2 rounded-full transition-all duration-300 ${i === 0 ? "w-8 bg-indigo-500" : "w-2 bg-white/20"}`}
-                            data-index={i}
-                            aria-label={`Artikel ${i + 1}`}
-                        />
-                    ))
-                }
-            </div>
+                    <!-- Controls -->
+                    <div class="flex items-center justify-between mt-8">
+                        <!-- Dots -->
+                        <div class="flex gap-2">
+                            {Array.from({ length: totalSlides }).map((_, i) => (
+                                <button
+                                    class={`artikel-dot h-2 rounded-full transition-all duration-300 ${i === 0 ? "w-8 bg-indigo-500" : "w-2 bg-white/20"}`}
+                                    data-index={i}
+                                    aria-label={`Artikel ${i + 1}`}
+                                />
+                            ))}
+                        </div>
 
-            <!-- Arrows -->
-            <div class="flex gap-3">
-                <button
-                    id="artikel-prev"
-                    class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
-                    aria-label="Artikel sebelumnya"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                </button>
-                <button
-                    id="artikel-next"
-                    class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
-                    aria-label="Artikel selanjutnya"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-5 h-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
+                        <!-- Arrows -->
+                        <div class="flex gap-3">
+                            <button
+                                id="artikel-prev"
+                                class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
+                                aria-label="Artikel sebelumnya"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M15 19l-7-7 7-7"
+                                    />
+                                </svg>
+                            </button>
+                            <button
+                                id="artikel-next"
+                                class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
+                                aria-label="Artikel selanjutnya"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 5l7 7-7 7"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div class="py-20 text-center text-slate-500">
+                    Belum ada artikel terbaru.
+                </div>
+            )
+        }
     </div>
 </section>
 

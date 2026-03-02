@@ -1,25 +1,118 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { getAllPrograms } from "./-api/repository";
+
+export const prerender = false;
+
+const programsList = await getAllPrograms({ isPublished: true, limit: 100 });
 ---
 
 <Layout
     title="Program – Annafilah"
-    description="Temukan program Annafilah yang tepat untuk kebutuhan bisnis Anda."
+    description="Temukan program kerja unggulan Yayasan Annafilah yang tepat untuk kebutuhan Anda."
 >
-    <section class="pt-32 pb-24 max-w-7xl mx-auto px-6">
-        <div class="text-center mb-16">
-            <p
-                class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
-            >
-                Apa yang Kami Tawarkan
-            </p>
-            <h1 class="text-5xl font-extrabold text-white mb-4">
-                Semua Program
-            </h1>
-            <p class="text-slate-400 text-lg max-w-xl mx-auto">
-                Pilih program yang sesuai dengan tahap dan kebutuhan bisnis Anda
-                saat ini.
-            </p>
+    <section class="pt-32 pb-24 bg-slate-950 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="mb-16">
+                <nav
+                    class="text-sm text-slate-500 mb-6 flex items-center gap-2"
+                >
+                    <a href="/" class="hover:text-indigo-400 transition-colors"
+                        >Beranda</a
+                    >
+                    <span>/</span>
+                    <span class="text-slate-300">Program</span>
+                </nav>
+
+                <div class="flex items-center justify-between gap-4 flex-wrap">
+                    <div>
+                        <p
+                            class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+                        >
+                            Apa yang Kami Tawarkan
+                        </p>
+                        <h1 class="text-5xl font-extrabold text-white mb-4">
+                            Semua Program
+                        </h1>
+                        <p class="text-slate-400 text-lg max-w-xl">
+                            Pilih program yang sesuai dengan tahap dan kebutuhan
+                            bisnis Anda saat ini.
+                        </p>
+                    </div>
+                    <a
+                        href="/program/create"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Tambah Program
+                    </a>
+                </div>
+            </div>
+
+            <!-- Programs Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {
+                    programsList.length > 0 ? (
+                        programsList.map((program) => (
+                            <a
+                                href={`/program/${program.slug}`}
+                                class="group block border border-white/5 rounded-2xl overflow-hidden bg-slate-900 hover:border-indigo-500/30 hover:-translate-y-1 transition-all duration-300"
+                            >
+                                <div class="relative aspect-[16/9] overflow-hidden bg-slate-800">
+                                    <img
+                                        src={program.image}
+                                        alt={program.name}
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        loading="lazy"
+                                    />
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                                </div>
+                                <div class="p-6">
+                                    <h2 class="text-white font-bold text-xl group-hover:text-indigo-300 transition-colors leading-snug mb-3">
+                                        {program.name}
+                                    </h2>
+                                    <span class="inline-flex items-center gap-1 text-indigo-400 text-sm font-semibold group-hover:gap-2 transition-all">
+                                        Lihat Program
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            class="w-4 h-4"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M9 5l7 7-7 7"
+                                            />
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        ))
+                    ) : (
+                        <div class="col-span-full py-20 text-center">
+                            <p class="text-slate-500 text-lg">
+                                Belum ada program yang tersedia.
+                            </p>
+                        </div>
+                    )
+                }
+            </div>
         </div>
     </section>
 </Layout>

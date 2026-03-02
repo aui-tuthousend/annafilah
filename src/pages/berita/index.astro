@@ -1,9 +1,21 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import NewsCardSmall from "./-components/NewsCardSmall.astro";
-import { allNews } from "../../data/news";
+import { getAllNews } from "./-api/repository";
 
-const categories = ["Semua", ...new Set(allNews.map((n) => n.category))];
+export const prerender = false;
+
+const news = await getAllNews({ isPublished: true, limit: 100 });
+const categories = ["Semua", ...new Set(news.map((n) => n.category))];
+
+// Helper to format date for the UI
+const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(date);
+};
 ---
 
 <Layout
@@ -22,14 +34,39 @@ const categories = ["Semua", ...new Set(allNews.map((n) => n.category))];
                 <span class="text-slate-300">Berita</span>
             </nav>
 
-            <p
-                class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+            <div
+                class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6"
             >
-                Terbaru
-            </p>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">
-                Berita & Update
-            </h1>
+                <div>
+                    <p
+                        class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+                    >
+                        Terbaru
+                    </p>
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-white">
+                        Berita & Update
+                    </h1>
+                </div>
+                <a
+                    href="/berita/create"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Tambah Berita
+                </a>
+            </div>
             <p class="text-slate-400 text-lg max-w-2xl">
                 Ikuti perkembangan terbaru kegiatan, kemitraan, dan pencapaian
                 Yayasan Annafilah.
@@ -67,22 +104,33 @@ const categories = ["Semua", ...new Set(allNews.map((n) => n.category))];
                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"
             >
                 {
-                    allNews.map((item) => (
+                    news.map((item) => (
                         <div class="news-item" data-category={item.category}>
-                            <NewsCardSmall {...item} />
+                            <NewsCardSmall
+                                title={item.title}
+                                date={formatDate(item.createdAt)}
+                                location={item.location}
+                                image={item.image}
+                                category={item.category}
+                                slug={item.slug}
+                            />
                         </div>
                     ))
                 }
             </div>
 
-            <!-- Empty State (tersembunyi secara default) -->
+            <!-- Empty State -->
             <div
                 id="empty-state"
-                class="hidden text-center py-24 text-slate-500"
+                class={`text-center py-24 text-slate-500 ${news.length > 0 ? "hidden" : ""}`}
             >
                 <p class="text-4xl mb-4">📭</p>
                 <p class="text-lg font-medium text-slate-400">
-                    Tidak ada berita di kategori ini
+                    {
+                        news.length === 0
+                            ? "Belum ada berita yang diterbitkan."
+                            : "Tidak ada berita di kategori ini."
+                    }
                 </p>
             </div>
         </div>

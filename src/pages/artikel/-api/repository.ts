@@ -24,7 +24,7 @@ function toResponse(row: typeof articles.$inferSelect): ArticleResponse {
         author: row.author,
         readingTime: row.readingTime,
         tags: row.tags ?? [],
-        image: row.image,
+        image: row.thumbnailUrl ?? "",   // thumbnailUrl in DB → image in DTO
         isPublished: row.isPublished,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
@@ -41,7 +41,7 @@ function toPreview(row: typeof articles.$inferSelect): ArticlePreview {
         author: row.author,
         readingTime: row.readingTime,
         tags: row.tags ?? [],
-        image: row.image,
+        image: row.thumbnailUrl ?? "",   // thumbnailUrl in DB → image in DTO
         createdAt: row.createdAt,
     };
 }
@@ -109,7 +109,7 @@ export async function createArticle(
             author: dto.author,
             readingTime: dto.readingTime,
             tags: dto.tags ?? [],
-            image: dto.image,
+            thumbnailUrl: dto.image,     // DTO uses `image`, DB column is `thumbnailUrl`
             isPublished: dto.isPublished ?? true,
         })
         .returning();
@@ -134,7 +134,7 @@ export async function updateArticle(
     if (dto.author !== undefined) updateData.author = dto.author;
     if (dto.readingTime !== undefined) updateData.readingTime = dto.readingTime;
     if (dto.tags !== undefined) updateData.tags = dto.tags;
-    if (dto.image !== undefined) updateData.image = dto.image;
+    if (dto.image !== undefined) updateData.thumbnailUrl = dto.image;
     if (dto.isPublished !== undefined) updateData.isPublished = dto.isPublished;
 
     const [row] = await db

@@ -1,0 +1,489 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout
+    title="Tambah Program – Annafilah"
+    description="Form untuk membuat program kerja baru di Yayasan Annafilah."
+>
+    <div class="min-h-screen bg-slate-950 pt-28 pb-20 px-6">
+        <div class="max-w-3xl mx-auto">
+            <!-- Header -->
+            <div class="mb-10">
+                <nav
+                    class="text-sm text-slate-500 mb-6 flex items-center gap-2"
+                >
+                    <a href="/" class="hover:text-indigo-400 transition-colors"
+                        >Beranda</a
+                    >
+                    <span>/</span>
+                    <a
+                        href="/program"
+                        class="hover:text-indigo-400 transition-colors"
+                        >Program</a
+                    >
+                    <span>/</span>
+                    <span class="text-slate-300">Tambah Program</span>
+                </nav>
+                <p
+                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-2"
+                >
+                    Manajemen Konten
+                </p>
+                <h1 class="text-4xl font-extrabold text-white">
+                    Tambah Program Baru
+                </h1>
+                <p class="text-slate-400 mt-2">
+                    Isi semua field untuk mempublikasikan program kerja
+                    unggulan.
+                </p>
+            </div>
+
+            <!-- Alert -->
+            <div
+                id="form-alert"
+                class="hidden mb-6 p-4 rounded-xl text-sm font-medium"
+            >
+            </div>
+
+            <!-- Form -->
+            <form id="create-program-form" novalidate class="space-y-6">
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="name" class="form-label">
+                        Nama Program <span class="text-red-400">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        required
+                        maxlength="200"
+                        placeholder="Contoh: Program Pemberdayaan Petani..."
+                        class="form-input"
+                    />
+                    <p class="form-hint text-right">
+                        <span id="name-count">0</span>/200
+                    </p>
+                </div>
+
+                <!-- Image -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Gambar Program <span class="text-red-400">*</span>
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(tampil di listing & halaman detail)</span
+                        >
+                    </label>
+
+                    <div id="upload-zone" class="relative cursor-pointer">
+                        <input
+                            type="file"
+                            id="image"
+                            name="image"
+                            accept="image/*"
+                            class="sr-only"
+                        />
+                        <div
+                            id="drop-ui"
+                            class="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-2xl p-10 bg-slate-900/40 hover:border-indigo-500/50 hover:bg-slate-900/60 transition-all duration-300"
+                        >
+                            <div
+                                class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-8 h-8 text-indigo-400"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    ></path>
+                                </svg>
+                            </div>
+                            <p class="text-white font-semibold">
+                                Klik atau drag & drop gambar
+                            </p>
+                            <p class="text-slate-500 text-sm mt-1">
+                                PNG, JPG atau WebP
+                            </p>
+                        </div>
+
+                        <!-- Preview -->
+                        <div
+                            id="img-preview"
+                            class="hidden mt-4 relative group"
+                        >
+                            <img
+                                id="img-preview-src"
+                                src=""
+                                alt="Preview"
+                                class="w-full max-h-64 object-cover rounded-2xl border border-white/10"
+                            />
+                            <button
+                                type="button"
+                                id="btn-remove-img"
+                                class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-400 text-white text-sm font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Hapus gambar">✕</button
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description" class="form-label">
+                        Deskripsi Program <span class="text-red-400">*</span>
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(mendukung HTML)</span
+                        >
+                    </label>
+
+                    <!-- HTML Shortcut Buttons -->
+                    <div
+                        class="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-900/50 border border-white/5 mb-1"
+                    >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="p"
+                            title="Paragraph">P</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="br"
+                            title="Line Break">BR</button
+                        >
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button
+                            type="button"
+                            class="html-tag-btn font-bold"
+                            data-tag="strong"
+                            title="Bold">B</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn italic"
+                            data-tag="em"
+                            title="Italic">I</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn underline"
+                            data-tag="u"
+                            title="Underline">U</button
+                        >
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="h2"
+                            title="Heading 2">H2</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="h3"
+                            title="Heading 3">H3</button
+                        >
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="ul"
+                            title="Unordered List">UL</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="li"
+                            title="List Item">LI</button
+                        >
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button
+                            type="button"
+                            class="html-tag-btn text-lg leading-none"
+                            data-tag="blockquote"
+                            title="Quote">"</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="a"
+                            title="Link">Link</button
+                        >
+                    </div>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        required
+                        rows="12"
+                        placeholder="<p>Deskripsikan program kerja ini...</p>"
+                        class="form-input resize-y font-mono text-sm"
+                    ></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 pt-2">
+                    <button
+                        type="submit"
+                        id="btn-submit"
+                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span id="btn-submit-text">Publikasikan Program</span>
+                    </button>
+                    <a
+                        href="/program"
+                        class="px-6 py-3.5 rounded-xl border border-white/10 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-base transition-colors"
+                    >
+                        Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    @reference "../../styles/global.css";
+    .form-group {
+        @apply flex flex-col gap-2;
+    }
+    .form-label {
+        @apply text-sm font-semibold text-slate-200;
+    }
+    .form-input {
+        @apply w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200;
+    }
+    .form-hint {
+        @apply text-xs text-slate-500;
+    }
+    .form-input.error {
+        @apply border-red-500/70 focus:ring-red-500;
+    }
+    .html-tag-btn {
+        @apply px-2.5 py-1 text-[10px] font-bold rounded bg-slate-800 text-slate-400 border border-white/5
+               hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all active:scale-95;
+    }
+</style>
+
+<script>
+    const nameInput = document.getElementById("name") as HTMLInputElement;
+    const nameCount = document.getElementById("name-count");
+    const imgInput = document.getElementById("image") as HTMLInputElement;
+    const uploadZone = document.getElementById("upload-zone");
+    const dropUi = document.getElementById("drop-ui");
+    const imgPreview = document.getElementById("img-preview");
+    const imgPreviewSrc = document.getElementById(
+        "img-preview-src",
+    ) as HTMLImageElement;
+    const btnRemoveImg = document.getElementById("btn-remove-img");
+    const alertEl = document.getElementById("form-alert");
+    const form = document.getElementById(
+        "create-program-form",
+    ) as HTMLFormElement;
+    const submitBtn = document.getElementById(
+        "btn-submit",
+    ) as HTMLButtonElement;
+    const submitText = document.getElementById("btn-submit-text");
+
+    let selectedFile: File | null = null;
+    let previewUrl: string | null = null;
+
+    // ── Slug helper ───────────────────────────────────────────────────────────
+    function toSlug(str: string): string {
+        return str
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9\s-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+    }
+
+    nameInput?.addEventListener("input", () => {
+        if (nameCount) nameCount.textContent = String(nameInput.value.length);
+    });
+
+    // ── Image Upload ──────────────────────────────────────────────────────────
+    function showPreview(file: File) {
+        selectedFile = file;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = URL.createObjectURL(file);
+        if (imgPreviewSrc) imgPreviewSrc.src = previewUrl;
+        dropUi?.classList.add("opacity-40");
+        imgPreview?.classList.remove("hidden");
+    }
+
+    function clearPreview() {
+        selectedFile = null;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+        if (imgPreviewSrc) imgPreviewSrc.src = "";
+        if (imgInput) imgInput.value = "";
+        dropUi?.classList.remove("opacity-40");
+        imgPreview?.classList.add("hidden");
+    }
+
+    imgInput?.addEventListener("change", (e) => {
+        const files = (e.target as HTMLInputElement).files;
+        if (files && files[0]) showPreview(files[0]);
+        imgInput.value = "";
+    });
+
+    uploadZone?.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (target.id === "btn-remove-img" || target.closest("#btn-remove-img"))
+            return;
+        if (!selectedFile) imgInput?.click();
+    });
+
+    btnRemoveImg?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        clearPreview();
+    });
+
+    uploadZone?.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropUi?.classList.add("!border-indigo-500/60", "!bg-slate-900/70");
+    });
+    uploadZone?.addEventListener("dragleave", () => {
+        dropUi?.classList.remove("!border-indigo-500/60", "!bg-slate-900/70");
+    });
+    uploadZone?.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropUi?.classList.remove("!border-indigo-500/60", "!bg-slate-900/70");
+        const files = (e as DragEvent).dataTransfer?.files;
+        if (files && files[0] && files[0].type.startsWith("image/"))
+            showPreview(files[0]);
+    });
+
+    // ── Alert ─────────────────────────────────────────────────────────────────
+    function showAlert(msg: string, type: "success" | "error") {
+        if (!alertEl) return;
+        alertEl.textContent = msg;
+        alertEl.className =
+            type === "success"
+                ? "mb-6 p-4 rounded-xl text-sm font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                : "mb-6 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400";
+        alertEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    // ── Submit ────────────────────────────────────────────────────────────────
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!alertEl) return;
+        alertEl.className = "hidden mb-6 p-4 rounded-xl text-sm font-medium";
+
+        const raw = new FormData(form);
+        const name = (raw.get("name") as string).trim();
+
+        if (!name) {
+            showAlert("Nama program wajib diisi.", "error");
+            nameInput.focus();
+            return;
+        }
+        if (!selectedFile) {
+            showAlert("Gambar program wajib diupload.", "error");
+            return;
+        }
+
+        const payload = new FormData();
+        payload.append("slug", toSlug(name));
+        payload.append("name", name);
+        payload.append(
+            "description",
+            (raw.get("description") as string).trim(),
+        );
+        payload.append("isPublished", "true");
+        payload.append("image", selectedFile);
+
+        submitBtn.disabled = true;
+        if (submitText) submitText.textContent = "Menyimpan...";
+
+        try {
+            const res = await fetch("/api/program", {
+                method: "POST",
+                body: payload,
+            });
+            const result = await res.json();
+            if (result.success) {
+                showAlert("✓ Program berhasil dipublikasikan!", "success");
+                form.reset();
+                clearPreview();
+                if (nameCount) nameCount.textContent = "0";
+                setTimeout(() => {
+                    window.location.href = "/program";
+                }, 1500);
+            } else {
+                showAlert(result.error ?? "Gagal menyimpan program.", "error");
+            }
+        } catch {
+            showAlert("Terjadi kesalahan jaringan. Coba lagi.", "error");
+        } finally {
+            submitBtn.disabled = false;
+            if (submitText) submitText.textContent = "Publikasikan Program";
+        }
+    });
+
+    // ── Content Tag Shortcuts ─────────────────────────────────────────────────
+    const descTextarea = document.getElementById(
+        "description",
+    ) as HTMLTextAreaElement;
+    document.querySelectorAll(".html-tag-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const tag = (btn as HTMLElement).dataset.tag;
+            if (!tag || !descTextarea) return;
+            const start = descTextarea.selectionStart;
+            const end = descTextarea.selectionEnd;
+            const text = descTextarea.value;
+            const sel = text.substring(start, end);
+            let ins = "";
+            let pos = start;
+            if (tag === "br") {
+                ins = "<br>\n";
+                pos = start + ins.length;
+            } else if (tag === "a") {
+                const url = prompt("URL link:", "https://");
+                if (!url) return;
+                ins = `<a href="${url}" target="_blank" class="text-indigo-400 hover:underline">${sel || "link"}</a>`;
+                pos = start + ins.length;
+            } else if (tag === "ul") {
+                ins = `<ul>\n  <li>${sel || "Item 1"}</li>\n  <li>Item 2</li>\n</ul>\n`;
+                pos = start + ins.length;
+            } else if (tag === "p") {
+                ins = `<p>${sel}</p>\n`;
+                pos = start + ins.length;
+            } else {
+                ins = `<${tag}>${sel}</${tag}>`;
+                pos = start + tag.length + 2 + sel.length;
+            }
+            descTextarea.value =
+                text.substring(0, start) + ins + text.substring(end);
+            descTextarea.focus();
+            descTextarea.setSelectionRange(pos, pos);
+        });
+    });
+</script>
