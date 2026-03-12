@@ -139,6 +139,18 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     try {
+        const articleData = await getArticleById(id);
+        if (articleData?.image) {
+            const fs = await import("node:fs/promises");
+            const path = await import("node:path");
+            const filePath = path.join(process.cwd(), "public", articleData.image);
+            try {
+                await fs.unlink(filePath);
+            } catch (e) {
+                console.warn(`[Delete] Gagal menghapus file: ${filePath}`, e);
+            }
+        }
+
         const deleted = await deleteArticle(id);
         if (!deleted) {
             return new Response(

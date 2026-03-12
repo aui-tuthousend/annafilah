@@ -1,0 +1,363 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getProgramBySlugAdmin } from "../-api/repository";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+    return Astro.redirect("/program");
+}
+
+const program = await getProgramBySlugAdmin(slug);
+
+if (!program) {
+    return Astro.redirect("/404");
+}
+---
+
+<Layout
+    title={`Edit Program: ${program.name} – Yayasan Annafilah`}
+    description={`Form untuk mengedit program "${program.name}" di Yayasan Annafilah.`}
+>
+    <div class="min-h-screen bg-slate-950 pt-28 pb-20 px-6">
+        <div class="max-w-3xl mx-auto">
+            <!-- Header -->
+            <div class="mb-10">
+                <nav
+                    class="text-sm text-slate-500 mb-6 flex items-center gap-2"
+                >
+                    <a href="/" class="hover:text-indigo-400 transition-colors"
+                        >Beranda</a
+                    >
+                    <span>/</span>
+                    <a
+                        href="/program"
+                        class="hover:text-indigo-400 transition-colors"
+                        >Program</a
+                    >
+                    <span>/</span>
+                    <span class="text-slate-300">Edit Program</span>
+                </nav>
+                <p
+                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-2"
+                >
+                    Manajemen Konten
+                </p>
+                <h1 class="text-4xl font-extrabold text-white">Edit Program</h1>
+                <p class="text-slate-400 mt-2">
+                    Perbarui informasi program yayasan.
+                </p>
+            </div>
+
+            <!-- Alert area -->
+            <div
+                id="form-alert"
+                class="hidden mb-6 p-4 rounded-xl text-sm font-medium"
+            >
+            </div>
+
+            <!-- Form -->
+            <form
+                id="edit-program-form"
+                novalidate
+                class="space-y-6"
+                data-id={program.id}
+            >
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="name" class="form-label"
+                        >Nama Program <span class="text-red-400">*</span></label
+                    >
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        required
+                        maxlength="100"
+                        value={program.name}
+                        placeholder="Contoh: Sedekah Quran"
+                        class="form-input"
+                    />
+                </div>
+
+                <!-- Slug -->
+                <div class="form-group">
+                    <label for="slug" class="form-label"
+                        >Slug URL <span class="text-red-400">*</span></label
+                    >
+                    <input
+                        type="text"
+                        id="slug"
+                        name="slug"
+                        required
+                        value={program.slug}
+                        placeholder="sedekah-quran"
+                        class="form-input"
+                    />
+                    <p class="form-hint">
+                        Digunakan untuk akses URL:
+                        domain.com/program/sedekah-quran
+                    </p>
+                </div>
+
+                <!-- Image -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Gambar Cover
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(Maksimal 2MB. Kosongkan jika tidak diganti)</span
+                        >
+                    </label>
+
+                    <div
+                        id="upload-zone"
+                        class="relative cursor-pointer group/zone"
+                    >
+                        <input
+                            type="file"
+                            id="image-input"
+                            name="image"
+                            accept="image/*"
+                            class="sr-only"
+                        />
+
+                        <div
+                            id="img-preview"
+                            class="relative overflow-hidden rounded-2xl border border-white/10 group-hover/zone:border-indigo-500/50 transition-colors"
+                        >
+                            <img
+                                id="preview-src"
+                                src={program.image}
+                                alt="Current cover"
+                                class="w-full aspect-[16/9] object-cover"
+                            />
+                            <div
+                                class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/40 opacity-0 group-hover/zone:opacity-100 transition-opacity"
+                            >
+                                <p class="text-white font-bold">
+                                    Ganti Foto Cover
+                                </p>
+                                <p class="text-slate-300 text-xs mt-1">
+                                    Klik untuk memilih file baru
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                id="btn-cancel-image"
+                                class="hidden absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white shadow-lg hover:bg-red-400 transition-all z-10"
+                                title="Batalkan penggantian"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description" class="form-label"
+                        >Deskripsi Program <span class="text-red-400">*</span
+                        ></label
+                    >
+                    <textarea
+                        id="description"
+                        name="description"
+                        required
+                        rows="8"
+                        placeholder="Jelaskan detail tujuan dan manfaat program ini..."
+                        class="form-input resize-y"
+                        >{program.description}</textarea
+                    >
+                </div>
+
+                <!-- Status -->
+                <div class="form-group">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input
+                            type="checkbox"
+                            name="isPublished"
+                            value="true"
+                            checked={program.isPublished}
+                            class="w-5 h-5 rounded border-white/10 bg-slate-900 text-indigo-600 focus:ring-0 focus:ring-offset-0"
+                        />
+                        <span
+                            class="text-slate-300 font-medium group-hover:text-white transition-colors"
+                            >Tampilkan di website (Publish)</span
+                        >
+                    </label>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 pt-4">
+                    <button
+                        type="submit"
+                        id="btn-submit"
+                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span id="btn-submit-text">Simpan Perubahan</span>
+                    </button>
+                    <a
+                        href="/program"
+                        class="px-6 py-3.5 rounded-xl border border-white/10 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-base transition-colors"
+                    >
+                        Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    @reference "../../../styles/global.css";
+    .form-group {
+        @apply flex flex-col gap-2;
+    }
+    .form-label {
+        @apply text-sm font-semibold text-slate-200;
+    }
+    .form-input {
+        @apply w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all;
+    }
+    .form-hint {
+        @apply text-xs text-slate-500;
+    }
+</style>
+
+<script>
+    const form = document.getElementById(
+        "edit-program-form",
+    ) as HTMLFormElement;
+    const alertEl = document.getElementById("form-alert");
+    const submitBtn = document.getElementById(
+        "btn-submit",
+    ) as HTMLButtonElement;
+    const submitText = document.getElementById("btn-submit-text");
+    const programId = form?.dataset.id;
+
+    // ── Image Handling ──
+    const imageInput = document.getElementById(
+        "image-input",
+    ) as HTMLInputElement;
+    const previewSrc = document.getElementById(
+        "preview-src",
+    ) as HTMLImageElement;
+    const btnCancelImage = document.getElementById("btn-cancel-image");
+    const initialSrc = previewSrc?.src;
+    let selectedFile: File | null = null;
+    let tempUrl: string | null = null;
+
+    document
+        .getElementById("upload-zone")
+        ?.addEventListener("click", () => imageInput?.click());
+
+    imageInput?.addEventListener("change", (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            showAlert("Ukuran gambar terlalu besar. Maksimal 2MB.", "error");
+            imageInput.value = "";
+            return;
+        }
+
+        selectedFile = file;
+        if (tempUrl) URL.revokeObjectURL(tempUrl);
+        tempUrl = URL.createObjectURL(file);
+        if (previewSrc) previewSrc.src = tempUrl;
+        btnCancelImage?.classList.remove("hidden");
+    });
+
+    btnCancelImage?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectedFile = null;
+        if (tempUrl) URL.revokeObjectURL(tempUrl);
+        tempUrl = null;
+        if (previewSrc) previewSrc.src = initialSrc;
+        if (imageInput) imageInput.value = "";
+        btnCancelImage?.classList.add("hidden");
+    });
+
+    // ── Submit Logic ──
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!alertEl || !programId) return;
+        alertEl.classList.add("hidden");
+
+        const raw = new FormData(form);
+        const name = (raw.get("name") as string).trim();
+        const slug = (raw.get("slug") as string).trim();
+        const description = (raw.get("description") as string).trim();
+
+        if (!name || !slug || !description) {
+            showAlert("Wajib mengisi Nama, Slug, dan Deskripsi.", "error");
+            return;
+        }
+
+        submitBtn.disabled = true;
+        if (submitText) submitText.textContent = "Menyimpan...";
+
+        const payload = new FormData();
+        payload.append("name", name);
+        payload.append("slug", slug);
+        payload.append("description", description);
+        payload.append(
+            "isPublished",
+            raw.has("isPublished") ? "true" : "false",
+        );
+
+        if (selectedFile) {
+            payload.append("image", selectedFile);
+        }
+
+        try {
+            const res = await fetch(`/api/program/${programId}`, {
+                method: "PUT",
+                body: payload,
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                showAlert("✓ Program berhasil diperbarui!", "success");
+                setTimeout(() => {
+                    window.location.href = "/program";
+                }, 1500);
+            } else {
+                showAlert(
+                    result.error || "Gagal memperbarui program.",
+                    "error",
+                );
+            }
+        } catch {
+            showAlert("Terjadi kesalahan jaringan.", "error");
+        } finally {
+            submitBtn.disabled = false;
+            if (submitText) submitText.textContent = "Simpan Perubahan";
+        }
+    });
+
+    function showAlert(msg: string, type: "success" | "error") {
+        if (!alertEl) return;
+        alertEl.textContent = msg;
+        alertEl.className =
+            type === "success"
+                ? "mb-6 p-4 rounded-xl text-sm font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block"
+                : "mb-6 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400 block";
+    }
+</script>

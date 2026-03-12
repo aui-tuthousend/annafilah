@@ -48,8 +48,35 @@ export const PUT: APIRoute = async ({ params, request }) => {
             // Get new images to upload
             newImageFiles = (formData.getAll("new_images") as File[]).filter(f => f && f.size > 0);
 
+            // 1. Validate file size (max 2MB)
+            const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+            for (const file of newImageFiles) {
+                if (file.size > MAX_SIZE) {
+                    return new Response(JSON.stringify({
+                        success: false,
+                        error: `Ukuran gambar "${file.name}" terlalu besar. Maksimal 2MB.`
+                    }), { status: 400 });
+                }
+            }
+
             const newsData = await getNewsById(id);
             if (!newsData) return new Response(JSON.stringify({ success: false, error: "Berita tidak ditemukan." }), { status: 404 });
+
+            // 2. Cleanup unused physical files
+            const imagesToRemove = newsData.images.filter(img => !existingImages.includes(img));
+            if (imagesToRemove.length > 0) {
+                const fs = await import("node:fs/promises");
+                const path = await import("node:path");
+                for (const imgUrl of imagesToRemove) {
+                    // Convert URL /uploads/... to local path public/uploads/...
+                    const filePath = path.join(process.cwd(), "public", imgUrl);
+                    try {
+                        await fs.unlink(filePath);
+                    } catch (e) {
+                        console.warn(`[Cleanup] Gagal menghapus file: ${filePath}`, e);
+                    }
+                }
+            }
 
             const finalSlug = body.slug || newsData.slug;
             const finalImages = [...existingImages];
@@ -95,10 +122,35 @@ export const DELETE: APIRoute = async ({ params }) => {
     if (!id) return new Response(JSON.stringify({ success: false, error: "ID tidak valid." }), { status: 400 });
 
     try {
+        const newsData = await getNewsById(id);
+        if (newsData) {
+            const fs = await import("node:fs/promises");
+            const path = await import("node:path");
+
+            // Delete all images in gallery
+            for (const imgUrl of newsData.images) {
+                const filePath = path.join(process.cwd(), "public", imgUrl);
+                try {
+                    await fs.unlink(filePath);
+                } catch (e) {
+                    console.warn(`[Delete] Gagal menghapus file gallery: ${filePath}`, e);
+                }
+            }
+
+            // Also check main image if not in gallery (though usually it is)
+            if (newsData.image && !newsData.images.includes(newsData.image)) {
+                const filePath = path.join(process.cwd(), "public", newsData.image);
+                try {
+                    await fs.unlink(filePath);
+                } catch (e) { /* ignored */ }
+            }
+        }
+
         const deleted = await deleteNews(id);
         if (!deleted) return new Response(JSON.stringify({ success: false, error: "Berita tidak ditemukan." }), { status: 404 });
         return new Response(JSON.stringify({ success: true, message: "Berita berhasil dihapus." }), { status: 200 });
     } catch (err) {
+        console.error("[DELETE /api/berita/:id]", err);
         return new Response(JSON.stringify({ success: false, error: "Gagal menghapus berita." }), { status: 500 });
     }
 };

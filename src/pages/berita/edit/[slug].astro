@@ -1,6 +1,7 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import { getNewsBySlugAdmin } from "../-api/repository";
+import { getAllPrograms } from "../../program/-api/repository";
 
 export const prerender = false;
 
@@ -10,7 +11,10 @@ if (!slug) {
     return Astro.redirect("/berita");
 }
 
-const newsItem = await getNewsBySlugAdmin(slug);
+const [newsItem, allPrograms] = await Promise.all([
+    getNewsBySlugAdmin(slug),
+    getAllPrograms({ isPublished: true, limit: 100 }),
+]);
 
 if (!newsItem) {
     return Astro.redirect("/404");
@@ -153,20 +157,50 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                     </div>
                 </div>
 
-                <!-- Author -->
-                <div class="form-group">
-                    <label for="author" class="form-label">
-                        Penulis <span class="text-red-400">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="author"
-                        name="author"
-                        required
-                        value={newsItem.author}
-                        placeholder="Nama penulis..."
-                        class="form-input"
-                    />
+                <!-- Author + Program -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="author" class="form-label">
+                            Penulis <span class="text-red-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="author"
+                            name="author"
+                            required
+                            value={newsItem.author}
+                            placeholder="Nama penulis..."
+                            class="form-input"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="programId" class="form-label">
+                            Program Terkait
+                            <span
+                                class="text-slate-500 font-normal text-xs ml-2"
+                                >(opsional)</span
+                            >
+                        </label>
+                        <select
+                            id="programId"
+                            name="programId"
+                            class="form-input"
+                        >
+                            <option value="">Tidak ada program</option>
+                            {
+                                allPrograms.map((prog) => (
+                                    <option
+                                        value={prog.id}
+                                        selected={
+                                            newsItem.programId === prog.id
+                                        }
+                                    >
+                                        {prog.name}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Gallery Management -->
@@ -174,7 +208,8 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                     <label class="form-label">
                         Galeri Gambar Berita <span class="text-red-400">*</span>
                         <span class="text-slate-500 font-normal text-xs ml-2"
-                            >(Gambar pertama akan menjadi Cover)</span
+                            >(Maksimal 2MB per foto. Gambar pertama akan menjadi
+                            Cover)</span
                         >
                     </label>
 
@@ -472,7 +507,15 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
         const files = (e.target as HTMLInputElement).files;
         if (!files) return;
 
+        const MAX_SIZE = 2 * 1024 * 1024; // 2MB
         for (const file of Array.from(files)) {
+            if (file.size > MAX_SIZE) {
+                showAlert(
+                    `Ukuran gambar "${file.name}" terlalu besar. Maksimal 2MB.`,
+                    "error",
+                );
+                continue;
+            }
             const url = URL.createObjectURL(file);
             galleryItems.push({
                 id: Math.random().toString(36),
@@ -535,6 +578,13 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
         payload.append("author", (raw.get("author") as string).trim());
         payload.append("location", (raw.get("location") as string).trim());
         payload.append("content", (raw.get("content") as string).trim());
+
+        const progId = raw.get("programId") as string;
+        if (progId) {
+            payload.append("programId", progId);
+        } else {
+            payload.append("programId", ""); // Send empty to clear relationship if needed
+        }
 
         // Add existing images to keep
         galleryItems

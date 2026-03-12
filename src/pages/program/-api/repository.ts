@@ -53,7 +53,7 @@ export async function getAllPrograms(
     return rows.map(toPreview);
 }
 
-// ─── READ: Get single program by slug ─────────────────────────────────────────
+// ─── READ: Get single program by slug (Public: only published) ───────────────
 export async function getProgramBySlug(
     slug: string
 ): Promise<ProgramResponse | null> {
@@ -61,6 +61,19 @@ export async function getProgramBySlug(
         .select()
         .from(programs)
         .where(and(eq(programs.slug, slug), eq(programs.isPublished, true)))
+        .limit(1);
+
+    return row ? toResponse(row) : null;
+}
+
+// ─── READ: Get single program by slug (Admin: including draft) ───────────────
+export async function getProgramBySlugAdmin(
+    slug: string
+): Promise<ProgramResponse | null> {
+    const [row] = await db
+        .select()
+        .from(programs)
+        .where(eq(programs.slug, slug))
         .limit(1);
 
     return row ? toResponse(row) : null;
