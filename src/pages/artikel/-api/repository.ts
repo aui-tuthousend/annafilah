@@ -81,7 +81,7 @@ export async function getArticleById(
     return row ? toResponse(row) : null;
 }
 
-// ─── READ: Get single article by slug ─────────────────────────────────────────
+// ─── READ: Get single article by slug (Public: only published) ────────────────
 export async function getArticleBySlug(
     slug: string
 ): Promise<ArticleResponse | null> {
@@ -89,6 +89,19 @@ export async function getArticleBySlug(
         .select()
         .from(articles)
         .where(and(eq(articles.slug, slug), eq(articles.isPublished, true)))
+        .limit(1);
+
+    return row ? toResponse(row) : null;
+}
+
+// ─── READ: Get single article by slug (Admin: including draft) ────────────────
+export async function getArticleBySlugAdmin(
+    slug: string
+): Promise<ArticleResponse | null> {
+    const [row] = await db
+        .select()
+        .from(articles)
+        .where(eq(articles.slug, slug))
         .limit(1);
 
     return row ? toResponse(row) : null;

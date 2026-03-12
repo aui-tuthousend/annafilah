@@ -1,13 +1,38 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import Layout from "../../../layouts/Layout.astro";
+import { getArticleBySlugAdmin } from "../-api/repository";
 
-// Middleware sudah memvalidasi login sebelum halaman ini dirender.
-const authorName = Astro.locals.username ?? "";
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+    return Astro.redirect("/artikel");
+}
+
+const article = await getArticleBySlugAdmin(slug);
+
+if (!article) {
+    return Astro.redirect("/404");
+}
+
+// Map categories to selections
+const categories = [
+    "Bisnis",
+    "Teknologi",
+    "Pertanian",
+    "Peternakan",
+    "Keuangan",
+    "Manajemen",
+    "Inspirasi",
+    "Tips & Trik",
+    "Lainnya",
+];
 ---
 
 <Layout
-    title="Tambah Artikel – Annafilah"
-    description="Form untuk membuat artikel baru di Yayasan Annafilah."
+    title={`Edit Artikel: ${article.title} – Annafilah`}
+    description={`Form untuk mengedit artikel "${article.title}" di Yayasan Annafilah.`}
 >
     <div class="min-h-screen bg-slate-950 pt-28 pb-20 px-6">
         <div class="max-w-3xl mx-auto">
@@ -26,19 +51,16 @@ const authorName = Astro.locals.username ?? "";
                         >Artikel</a
                     >
                     <span>/</span>
-                    <span class="text-slate-300">Tambah Artikel</span>
+                    <span class="text-slate-300">Edit Artikel</span>
                 </nav>
                 <p
                     class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-2"
                 >
                     Manajemen Konten
                 </p>
-                <h1 class="text-4xl font-extrabold text-white">
-                    Tambah Artikel Baru
-                </h1>
+                <h1 class="text-4xl font-extrabold text-white">Edit Artikel</h1>
                 <p class="text-slate-400 mt-2">
-                    Isi semua field yang diperlukan untuk mempublikasikan
-                    artikel.
+                    Perbarui informasi artikel di bawah ini.
                 </p>
             </div>
 
@@ -50,7 +72,13 @@ const authorName = Astro.locals.username ?? "";
             </div>
 
             <!-- Form -->
-            <form id="create-artikel-form" novalidate class="space-y-6">
+            <form
+                id="edit-artikel-form"
+                novalidate
+                class="space-y-6"
+                data-id={article.id}
+                data-current-slug={article.slug}
+            >
                 <!-- Title -->
                 <div class="form-group">
                     <label for="title" class="form-label">
@@ -62,11 +90,12 @@ const authorName = Astro.locals.username ?? "";
                         name="title"
                         required
                         maxlength="100"
+                        value={article.title}
                         placeholder="Tulis judul artikel yang menarik..."
                         class="form-input"
                     />
                     <p class="form-hint text-right">
-                        <span id="title-count">0</span>/100
+                        <span id="title-count">{article.title.length}</span>/100
                     </p>
                 </div>
 
@@ -85,9 +114,12 @@ const authorName = Astro.locals.username ?? "";
                         maxlength="300"
                         rows="3"
                         placeholder="Tuliskan ringkasan singkat artikel ini..."
-                        class="form-input resize-none"></textarea>
+                        class="form-input resize-none"
+                        >{article.excerpt}</textarea
+                    >
                     <p class="form-hint text-right">
-                        <span id="excerpt-count">0</span>/300
+                        <span id="excerpt-count">{article.excerpt.length}</span
+                        >/300
                     </p>
                 </div>
 
@@ -103,18 +135,17 @@ const authorName = Astro.locals.username ?? "";
                             required
                             class="form-input"
                         >
-                            <option value="" disabled selected
-                                >Pilih kategori...</option
-                            >
-                            <option value="Bisnis">Bisnis</option>
-                            <option value="Teknologi">Teknologi</option>
-                            <option value="Pertanian">Pertanian</option>
-                            <option value="Peternakan">Peternakan</option>
-                            <option value="Keuangan">Keuangan</option>
-                            <option value="Manajemen">Manajemen</option>
-                            <option value="Inspirasi">Inspirasi</option>
-                            <option value="Tips & Trik">Tips & Trik</option>
-                            <option value="Lainnya">Lainnya</option>
+                            <option value="" disabled>Pilih kategori...</option>
+                            {
+                                categories.map((cat) => (
+                                    <option
+                                        value={cat}
+                                        selected={article.category === cat}
+                                    >
+                                        {cat}
+                                    </option>
+                                ))
+                            }
                         </select>
                     </div>
                     <div class="form-group">
@@ -126,7 +157,7 @@ const authorName = Astro.locals.username ?? "";
                             id="author"
                             name="author"
                             required
-                            value={authorName}
+                            value={article.author}
                             placeholder="Nama penulis..."
                             class="form-input"
                         />
@@ -146,6 +177,7 @@ const authorName = Astro.locals.username ?? "";
                             id="readingTime"
                             name="readingTime"
                             required
+                            value={article.readingTime}
                             placeholder="Contoh: 5 menit baca"
                             class="form-input"
                         />
@@ -170,10 +202,9 @@ const authorName = Astro.locals.username ?? "";
                                 type="hidden"
                                 id="tags-hidden"
                                 name="tags"
-                                value="[]"
+                                value={JSON.stringify(article.tags)}
                             />
                         </div>
-                        <!-- Tags Pills -->
                         <div
                             id="tags-pills"
                             class="flex flex-wrap gap-1.5 mt-2 empty:hidden"
@@ -185,14 +216,16 @@ const authorName = Astro.locals.username ?? "";
                 <!-- Thumbnail Image -->
                 <div class="form-group">
                     <label class="form-label">
-                        Gambar Thumbnail <span class="text-red-400">*</span>
+                        Gambar Thumbnail
                         <span class="text-slate-500 font-normal text-xs ml-2"
-                            >(ditampilkan di listing artikel)</span
+                            >(kosongkan jika tidak ingin mengganti)</span
                         >
                     </label>
 
-                    <!-- Upload Drop Zone -->
-                    <div id="upload-zone" class="relative cursor-pointer">
+                    <div
+                        id="upload-zone"
+                        class="relative cursor-pointer group/zone"
+                    >
                         <input
                             type="file"
                             id="image"
@@ -200,62 +233,40 @@ const authorName = Astro.locals.username ?? "";
                             accept="image/*"
                             class="sr-only"
                         />
-                        <div
-                            id="drop-ui"
-                            class="flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-2xl p-10 bg-slate-900/40 hover:border-indigo-500/50 hover:bg-slate-900/60 transition-all duration-300"
-                        >
-                            <div
-                                class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    class="w-8 h-8 text-indigo-400"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                    ></path>
-                                </svg>
-                            </div>
-                            <p class="text-white font-semibold">
-                                Klik atau drag & drop gambar
-                            </p>
-                            <p class="text-slate-500 text-sm mt-1">
-                                PNG, JPG atau WebP &mdash; 1 gambar thumbnail
-                            </p>
-                        </div>
 
-                        <!-- Preview after upload -->
-                        <div
-                            id="img-preview"
-                            class="hidden mt-4 relative group"
-                        >
+                        <!-- Initial state (Current Image) -->
+                        <div id="img-preview" class="relative">
                             <img
                                 id="img-preview-src"
-                                src=""
-                                alt="Preview thumbnail"
-                                class="w-full max-h-64 object-cover rounded-2xl border border-white/10"
+                                src={article.image}
+                                alt="Current thumbnail"
+                                class="w-full max-h-64 object-cover rounded-2xl border border-white/10 group-hover/zone:border-indigo-500/50 transition-colors"
                             />
-                            <button
-                                type="button"
-                                id="btn-remove-img"
-                                class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-400 text-white text-sm font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                title="Hapus gambar"
+                            <div
+                                class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/40 opacity-0 group-hover/zone:opacity-100 transition-opacity rounded-2xl"
                             >
-                                ✕
-                            </button>
+                                <p class="text-white font-bold">Ganti Gambar</p>
+                                <p
+                                    class="text-slate-300 text-xs mt-1 text-center px-4"
+                                >
+                                    Klik atau drag gambar baru ke sini
+                                </p>
+                            </div>
                             <div class="absolute bottom-3 left-3">
                                 <span
                                     class="px-2 py-1 rounded-full bg-indigo-600/90 text-white text-xs font-semibold backdrop-blur-sm"
                                 >
-                                    Thumbnail
+                                    Thumbnail Saat Ini
                                 </span>
                             </div>
+                            <button
+                                type="button"
+                                id="btn-remove-img"
+                                class="hidden absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-400 text-white text-sm font-bold shadow-lg transition-opacity"
+                                title="Batalkan penggantian"
+                            >
+                                ✕
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -269,7 +280,6 @@ const authorName = Astro.locals.username ?? "";
                         >
                     </label>
 
-                    <!-- HTML Shortcut Buttons -->
                     <div
                         class="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-900/50 border border-white/5 mb-1"
                     >
@@ -277,89 +287,77 @@ const authorName = Astro.locals.username ?? "";
                             type="button"
                             class="html-tag-btn"
                             data-tag="p"
-                            title="Paragraph (Alinea Baru)">P</button
+                            title="Paragraph">P</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="br"
-                            title="Line Break (Garis Baru)">BR</button
+                            title="Line Break">BR</button
                         >
                         <div class="w-px h-4 bg-white/10 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn font-bold"
                             data-tag="strong"
-                            title="Bold (Tebal)">B</button
+                            title="Bold">B</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn italic"
                             data-tag="em"
-                            title="Italic (Miring)">I</button
+                            title="Italic">I</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn underline"
                             data-tag="u"
-                            title="Underline (Garis Bawah)">U</button
+                            title="Underline">U</button
                         >
                         <div class="w-px h-4 bg-white/10 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="h2"
-                            title="Heading 2 (Judul Bagian)">H2</button
+                            title="Heading 2">H2</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="h3"
-                            title="Heading 3 (Sub-judul)">H3</button
+                            title="Heading 3">H3</button
                         >
                         <div class="w-px h-4 bg-white/10 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="ul"
-                            title="Unordered List (Daftar)">UL</button
+                            title="Unordered List">UL</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="li"
-                            title="List Item (Poin Daftar)">LI</button
-                        >
-                        <button
-                            type="button"
-                            class="html-tag-btn"
-                            data-tag="ol"
-                            title="Ordered List (Daftar Bernomor)">OL</button
+                            title="List Item">LI</button
                         >
                         <div class="w-px h-4 bg-white/10 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn text-lg leading-none"
                             data-tag="blockquote"
-                            title="Quote (Kutipan)">"</button
+                            title="Quote">"</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="a"
-                            title="Link (Tautan)">Link</button
-                        >
-                        <button
-                            type="button"
-                            class="html-tag-btn"
-                            data-tag="code"
-                            title="Inline Code">Code</button
+                            title="Link">Link</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="hr"
-                            title="Horizontal Rule (Garis Pemisah)">HR</button
+                            title="Horizontal Line">HR</button
                         >
                     </div>
 
@@ -368,9 +366,10 @@ const authorName = Astro.locals.username ?? "";
                         name="content"
                         required
                         rows="16"
-                        placeholder="<p>Tulis konten artikel di sini...</p>"
+                        placeholder="Tulis konten artikel di sini..."
                         class="form-input resize-y font-mono text-sm"
-                    ></textarea>
+                        >{article.content}</textarea
+                    >
                 </div>
 
                 <!-- Action Buttons -->
@@ -378,7 +377,7 @@ const authorName = Astro.locals.username ?? "";
                     <button
                         type="submit"
                         id="btn-submit"
-                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -391,9 +390,9 @@ const authorName = Astro.locals.username ?? "";
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
-                                d="M12 4v16m8-8H4"></path>
+                                d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span id="btn-submit-text">Publikasikan Artikel</span>
+                        <span id="btn-submit-text">Simpan Perubahan</span>
                     </button>
                     <a
                         href="/artikel"
@@ -408,7 +407,7 @@ const authorName = Astro.locals.username ?? "";
 </Layout>
 
 <style>
-    @reference "../../styles/global.css";
+    @reference "../../../styles/global.css";
     .form-group {
         @apply flex flex-col gap-2;
     }
@@ -417,18 +416,14 @@ const authorName = Astro.locals.username ?? "";
     }
     .form-input {
         @apply w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500
-               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-               transition-all duration-200;
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all;
     }
     .form-hint {
         @apply text-xs text-slate-500;
     }
-    .form-input.error {
-        @apply border-red-500/70 focus:ring-red-500;
-    }
     .html-tag-btn {
         @apply px-2.5 py-1 text-[10px] font-bold rounded bg-slate-800 text-slate-400 border border-white/5
-               hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all active:scale-95;
+               hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all;
     }
     .tag-pill {
         @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-600/20 border border-indigo-500/30
@@ -437,40 +432,42 @@ const authorName = Astro.locals.username ?? "";
 </style>
 
 <script>
-    const titleInput = document.getElementById("title") as HTMLInputElement;
-    const titleCount = document.getElementById("title-count");
-    const excerptEl = document.getElementById("excerpt") as HTMLTextAreaElement;
-    const excerptCount = document.getElementById("excerpt-count");
-    const imgInput = document.getElementById("image") as HTMLInputElement;
-    const uploadZone = document.getElementById("upload-zone");
-    const dropUi = document.getElementById("drop-ui");
-    const imgPreview = document.getElementById("img-preview");
-    const imgPreviewSrc = document.getElementById(
-        "img-preview-src",
-    ) as HTMLImageElement;
-    const btnRemoveImg = document.getElementById("btn-remove-img");
     const form = document.getElementById(
-        "create-artikel-form",
+        "edit-artikel-form",
     ) as HTMLFormElement;
     const alertEl = document.getElementById("form-alert");
     const submitBtn = document.getElementById(
         "btn-submit",
     ) as HTMLButtonElement;
     const submitText = document.getElementById("btn-submit-text");
+    const titleInput = document.getElementById("title") as HTMLInputElement;
+    const titleCount = document.getElementById("title-count");
+    const excerptEl = document.getElementById("excerpt") as HTMLTextAreaElement;
+    const excerptCount = document.getElementById("excerpt-count");
 
-    // ── Slug helpers ──────────────────────────────────────────────────────────
-    function toSlug(str: string): string {
-        return str
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9\s-]/g, "")
-            .trim()
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-");
-    }
+    const imgInput = document.getElementById("image") as HTMLInputElement;
+    const imgPreviewSrc = document.getElementById(
+        "img-preview-src",
+    ) as HTMLImageElement;
+    const btnRemoveImg = document.getElementById("btn-remove-img");
+    const initialImgSrc = imgPreviewSrc?.src;
 
-    // ── Character counters ────────────────────────────────────────────────────
+    const tagsHidden = document.getElementById(
+        "tags-hidden",
+    ) as HTMLInputElement;
+    const tagsInputEl = document.getElementById(
+        "tags-input",
+    ) as HTMLInputElement;
+    const tagsPills = document.getElementById("tags-pills");
+
+    const articleId = form?.dataset.id;
+    const initialSlug = form?.dataset.currentSlug;
+
+    let selectedFile: File | null = null;
+    let previewUrl: string | null = null;
+    let tags: string[] = JSON.parse(tagsHidden?.value || "[]");
+
+    // ── Character Counters ────────────────────────────────────────────────────
     titleInput?.addEventListener("input", () => {
         if (titleCount)
             titleCount.textContent = String(titleInput.value.length);
@@ -480,76 +477,31 @@ const authorName = Astro.locals.username ?? "";
             excerptCount.textContent = String(excerptEl.value.length);
     });
 
-    // ── Image Upload ──────────────────────────────────────────────────────────
-    let selectedFile: File | null = null;
-    let previewUrl: string | null = null;
-
-    function showPreview(file: File) {
-        selectedFile = file;
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = URL.createObjectURL(file);
-        if (imgPreviewSrc) imgPreviewSrc.src = previewUrl;
-        dropUi?.classList.add("opacity-40");
-        imgPreview?.classList.remove("hidden");
-    }
-
-    function clearPreview() {
-        selectedFile = null;
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = null;
-        if (imgPreviewSrc) imgPreviewSrc.src = "";
-        if (imgInput) imgInput.value = "";
-        dropUi?.classList.remove("opacity-40");
-        imgPreview?.classList.add("hidden");
-    }
-
+    // ── Image Handling ────────────────────────────────────────────────────────
     imgInput?.addEventListener("change", (e) => {
         const files = (e.target as HTMLInputElement).files;
-        if (files && files[0]) showPreview(files[0]);
-        imgInput.value = "";
-    });
-
-    uploadZone?.addEventListener("click", (e) => {
-        const target = e.target as HTMLElement;
-        if (target.id === "btn-remove-img" || target.closest("#btn-remove-img"))
-            return;
-        if (!selectedFile) imgInput?.click();
+        if (files && files[0]) {
+            selectedFile = files[0];
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            previewUrl = URL.createObjectURL(selectedFile);
+            if (imgPreviewSrc) imgPreviewSrc.src = previewUrl;
+            btnRemoveImg?.classList.remove("hidden");
+        }
     });
 
     btnRemoveImg?.addEventListener("click", (e) => {
         e.stopPropagation();
-        clearPreview();
+        selectedFile = null;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+        if (imgPreviewSrc) imgPreviewSrc.src = initialImgSrc;
+        if (imgInput) imgInput.value = "";
+        btnRemoveImg?.classList.add("hidden");
     });
 
-    // Drag & drop
-    uploadZone?.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropUi?.classList.add("!border-indigo-500/60", "!bg-slate-900/70");
-    });
-    uploadZone?.addEventListener("dragleave", () => {
-        dropUi?.classList.remove("!border-indigo-500/60", "!bg-slate-900/70");
-    });
-    uploadZone?.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropUi?.classList.remove("!border-indigo-500/60", "!bg-slate-900/70");
-        const files = (e as DragEvent).dataTransfer?.files;
-        if (files && files[0] && files[0].type.startsWith("image/")) {
-            showPreview(files[0]);
-        }
-    });
-
-    // ── Tags Input ────────────────────────────────────────────────────────────
-    const tagsInputEl = document.getElementById(
-        "tags-input",
-    ) as HTMLInputElement;
-    const tagsHidden = document.getElementById(
-        "tags-hidden",
-    ) as HTMLInputElement;
-    const tagsPills = document.getElementById("tags-pills");
-    let tags: string[] = [];
-
+    // ── Tags Handling ─────────────────────────────────────────────────────────
     function renderTags() {
-        if (!tagsPills) return;
+        if (!tagsPills || !tagsHidden) return;
         tagsPills.innerHTML = "";
         tags.forEach((tag, idx) => {
             const pill = document.createElement("span");
@@ -561,8 +513,9 @@ const authorName = Astro.locals.username ?? "";
             });
             tagsPills.appendChild(pill);
         });
-        if (tagsHidden) tagsHidden.value = JSON.stringify(tags);
+        tagsHidden.value = JSON.stringify(tags);
     }
+    renderTags();
 
     tagsInputEl?.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === ",") {
@@ -576,43 +529,24 @@ const authorName = Astro.locals.username ?? "";
         }
     });
 
-    // ── Alert ─────────────────────────────────────────────────────────────────
-    function showAlert(msg: string, type: "success" | "error") {
-        if (!alertEl) return;
-        alertEl.textContent = msg;
-        alertEl.className =
-            type === "success"
-                ? "mb-6 p-4 rounded-xl text-sm font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-                : "mb-6 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400";
-        alertEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-
     // ── Submit ────────────────────────────────────────────────────────────────
     form?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        if (!alertEl) return;
-        alertEl.className = "hidden mb-6 p-4 rounded-xl text-sm font-medium";
+        if (!alertEl || !articleId) return;
+        alertEl.classList.add("hidden");
 
         const raw = new FormData(form);
         const title = (raw.get("title") as string).trim();
-        const slug = toSlug(title);
 
         if (!title) {
             showAlert("Judul wajib diisi.", "error");
-            titleInput.focus();
-            return;
-        }
-        if (!selectedFile) {
-            showAlert("Gambar thumbnail artikel wajib diupload.", "error");
             return;
         }
 
         submitBtn.disabled = true;
         if (submitText) submitText.textContent = "Menyimpan...";
 
-        // Build FormData
         const payload = new FormData();
-        payload.append("slug", slug);
         payload.append("title", title);
         payload.append("excerpt", (raw.get("excerpt") as string).trim());
         payload.append("category", (raw.get("category") as string).trim());
@@ -623,98 +557,64 @@ const authorName = Astro.locals.username ?? "";
         );
         payload.append("content", (raw.get("content") as string).trim());
         payload.append("tags", JSON.stringify(tags));
-        payload.append("isPublished", "true");
-        payload.append("image", selectedFile);
+
+        if (selectedFile) {
+            payload.append("image", selectedFile);
+        }
 
         try {
-            const res = await fetch("/api/artikel", {
-                method: "POST",
+            const res = await fetch(`/api/artikel/${articleId}`, {
+                method: "PUT",
                 body: payload,
             });
             const result = await res.json();
 
             if (result.success) {
-                showAlert("✓ Artikel berhasil dipublikasikan!", "success");
-                form.reset();
-                clearPreview();
-                tags = [];
-                renderTags();
-                if (titleCount) titleCount.textContent = "0";
-                if (excerptCount) excerptCount.textContent = "0";
+                showAlert("✓ Artikel berhasil diperbarui!", "success");
                 setTimeout(() => {
                     window.location.href = "/artikel";
                 }, 1500);
             } else {
-                showAlert(result.error ?? "Gagal menyimpan artikel.", "error");
+                showAlert(
+                    result.error ?? "Gagal memperbarui artikel.",
+                    "error",
+                );
             }
         } catch {
-            showAlert("Terjadi kesalahan jaringan. Coba lagi.", "error");
+            showAlert("Terjadi kesalahan jaringan.", "error");
         } finally {
             submitBtn.disabled = false;
-            if (submitText) submitText.textContent = "Publikasikan Artikel";
+            if (submitText) submitText.textContent = "Simpan Perubahan";
         }
     });
 
-    // ── Content Tag Shortcuts ─────────────────────────────────────────────────
+    function showAlert(msg: string, type: "success" | "error") {
+        if (!alertEl) return;
+        alertEl.textContent = msg;
+        alertEl.className =
+            type === "success"
+                ? "mb-6 p-4 rounded-xl text-sm font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block"
+                : "mb-6 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400 block";
+    }
+
+    // ── Content Shortcuts ──
     const contentTextarea = document.getElementById(
         "content",
     ) as HTMLTextAreaElement;
-    const tagButtons = document.querySelectorAll(".html-tag-btn");
-
-    tagButtons.forEach((btn) => {
+    document.querySelectorAll(".html-tag-btn").forEach((btn) => {
         btn.addEventListener("click", () => {
             const tag = (btn as HTMLElement).dataset.tag;
             if (!tag || !contentTextarea) return;
-
             const start = contentTextarea.selectionStart;
             const end = contentTextarea.selectionEnd;
             const text = contentTextarea.value;
             const selectedText = text.substring(start, end);
-
-            let insertion = "";
-            let newCursorPos = start;
-
-            if (tag === "br" || tag === "hr") {
-                insertion = tag === "br" ? "<br>\n" : "<hr>\n";
-                newCursorPos = start + insertion.length;
-            } else if (tag === "a") {
-                const url = prompt("Masukkan URL link:", "https://");
-                if (url === null) return;
-                insertion = `<a href="${url}" target="_blank" class="text-indigo-400 hover:underline">${selectedText || "link"}</a>`;
-                newCursorPos = start + insertion.length;
-            } else if (tag === "ul") {
-                insertion = `<ul>\n  <li>${selectedText || "Item 1"}</li>\n  <li>Item 2</li>\n</ul>\n`;
-                newCursorPos = start + insertion.length;
-            } else if (tag === "ol") {
-                insertion = `<ol>\n  <li>${selectedText || "Item 1"}</li>\n  <li>Item 2</li>\n</ol>\n`;
-                newCursorPos = start + insertion.length;
-            } else if (tag === "p") {
-                insertion = `<p>${selectedText}</p>\n`;
-                newCursorPos = start + insertion.length;
-            } else if (tag === "blockquote") {
-                insertion = `<blockquote class="border-l-4 border-indigo-500 pl-4 italic text-slate-400">${selectedText || "Tulis kutipan di sini..."}</blockquote>\n`;
-                newCursorPos = start + insertion.length;
-            } else {
-                insertion = `<${tag}>${selectedText}</${tag}>`;
-                newCursorPos = start + tag.length + 2 + selectedText.length;
-            }
-
+            let insertion = `<${tag}>${selectedText}</${tag}>`;
+            if (tag === "br") insertion = "<br>\n";
+            if (tag === "hr") insertion = "<hr>\n";
             contentTextarea.value =
                 text.substring(0, start) + insertion + text.substring(end);
-
             contentTextarea.focus();
-            contentTextarea.setSelectionRange(newCursorPos, newCursorPos);
-            contentTextarea.dispatchEvent(new Event("input"));
         });
     });
-
-    // Clear error class on re-input
-    document
-        .querySelectorAll<
-            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-        >(".form-input")
-        .forEach((el) => {
-            el.addEventListener("input", () => el.classList.remove("error"));
-            el.addEventListener("change", () => el.classList.remove("error"));
-        });
 </script>

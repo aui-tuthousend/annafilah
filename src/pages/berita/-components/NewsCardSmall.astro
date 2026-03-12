@@ -7,9 +7,18 @@ interface Props {
     image: string;
     category: string;
     slug: string;
+    isLoggedIn?: boolean;
 }
 
-const { title, date, location, image, category, slug } = Astro.props;
+const {
+    title,
+    date,
+    location,
+    image,
+    category,
+    slug,
+    isLoggedIn = false,
+} = Astro.props;
 ---
 
 <a
@@ -24,11 +33,38 @@ const { title, date, location, image, category, slug } = Astro.props;
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 select-none"
             loading="lazy"
         />
-        <span
-            class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-indigo-600/90 backdrop-blur-sm text-white text-xs font-semibold uppercase tracking-wider"
-        >
-            {category}
-        </span>
+        <div class="absolute top-3 inset-x-3 flex justify-between items-start">
+            <span
+                class="px-2.5 py-1 rounded-full bg-indigo-600/90 backdrop-blur-sm text-white text-xs font-semibold uppercase tracking-wider"
+            >
+                {category}
+            </span>
+
+            {
+                isLoggedIn && (
+                    <button
+                        onclick={`event.preventDefault(); event.stopPropagation(); window.location.href='/berita/edit/${slug}'`}
+                        class="p-1.5 rounded-full bg-slate-950/80 text-white hover:text-indigo-400 border border-white/10 hover:border-indigo-500/50 backdrop-blur-sm transition-all group/edit"
+                        title="Edit Berita"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                            />
+                        </svg>
+                    </button>
+                )
+            }
+        </div>
     </div>
 
     <!-- Info -->

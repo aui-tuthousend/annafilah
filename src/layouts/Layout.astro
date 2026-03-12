@@ -17,6 +17,11 @@ const canonicalURL = new URL(
   Astro.url.pathname,
   Astro.site ?? Astro.url.origin,
 );
+
+// Cek session via Astro.locals yang diisi oleh middleware (Hemat Database Query)
+const currentUser = Astro.locals.username
+  ? { username: Astro.locals.username }
+  : null;
 ---
 
 <!doctype html>
@@ -127,12 +132,50 @@ const canonicalURL = new URL(
             </li>
           </ul>
         </div>
-        <div class="navbar-end">
-          <a
-            href="#contact"
-            class="btn bg-indigo-600 hover:bg-indigo-500 border-none text-white btn-sm md:btn-md"
-            >Hubungi Kami</a
-          >
+        <div class="navbar-end gap-2">
+          {
+            currentUser ? (
+              // ── Admin sedang login ───────────────────────────────────────────
+              <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30">
+                  <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span class="text-indigo-300 text-xs font-semibold">
+                    {currentUser.username}
+                  </span>
+                </div>
+                <form method="POST" action="/api/auth/logout">
+                  <button
+                    type="submit"
+                    class="btn btn-ghost btn-sm text-slate-400 hover:text-white hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    <span class="hidden md:inline">Logout</span>
+                  </button>
+                </form>
+              </div>
+            ) : (
+              // ── Belum login ──────────────────────────────────────────────────
+              <a
+                href="#contact"
+                class="btn bg-indigo-600 hover:bg-indigo-500 border-none text-white btn-sm md:btn-md"
+              >
+                Hubungi Kami
+              </a>
+            )
+          }
         </div>
       </div>
     </header>

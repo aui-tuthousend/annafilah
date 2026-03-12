@@ -1,0 +1,277 @@
+---
+// src/pages/login.astro
+// ─── Halaman login admin ───────────────────────────────────────────────────────
+import Layout from "../layouts/Layout.astro";
+import { validateSession, SESSION_COOKIE } from "../lib/auth";
+
+// Jika sudah login → redirect ke halaman tujuan atau ke /berita
+const sessionId = Astro.cookies.get(SESSION_COOKIE)?.value;
+const user = await validateSession(sessionId);
+if (user) {
+    const next = Astro.url.searchParams.get("next") ?? "/berita";
+    return Astro.redirect(next);
+}
+
+const nextParam = Astro.url.searchParams.get("next") ?? "";
+---
+
+<Layout
+    title="Login – Annafilah Admin"
+    description="Masuk ke panel administrasi Yayasan Annafilah."
+>
+    <div
+        class="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-20"
+    >
+        <!-- Background glow -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div
+                class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-3xl"
+            >
+            </div>
+        </div>
+
+        <div class="relative w-full max-w-md">
+            <!-- Logo / Brand -->
+            <div class="text-center mb-8">
+                <a href="/" class="inline-block">
+                    <img
+                        src="/logo.webp"
+                        alt="Annafilah"
+                        class="h-12 mx-auto object-contain"
+                    />
+                </a>
+                <p
+                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mt-4 mb-1"
+                >
+                    Panel Administrasi
+                </p>
+                <h1 class="text-3xl font-extrabold text-white">Masuk</h1>
+                <p class="text-slate-400 text-sm mt-2">
+                    Masukkan kredensial admin kamu untuk melanjutkan.
+                </p>
+            </div>
+
+            <!-- Card -->
+            <div
+                class="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl"
+            >
+                <!-- Alert error -->
+                <div
+                    id="login-alert"
+                    class="hidden mb-5 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400"
+                >
+                </div>
+
+                <!-- Form Login -->
+                <form id="login-form" novalidate class="space-y-5">
+                    <input type="hidden" id="next-url" value={nextParam} />
+
+                    <!-- Username -->
+                    <div class="space-y-1.5">
+                        <label
+                            for="username"
+                            class="block text-sm font-semibold text-slate-200"
+                        >
+                            Username
+                        </label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            required
+                            autocomplete="username"
+                            placeholder="username admin"
+                            class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-white/10 text-white placeholder-slate-500
+                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                                   transition-all duration-200"
+                        />
+                    </div>
+
+                    <!-- Password -->
+                    <div class="space-y-1.5">
+                        <label
+                            for="password"
+                            class="block text-sm font-semibold text-slate-200"
+                        >
+                            Password
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                                autocomplete="current-password"
+                                placeholder="••••••••"
+                                class="w-full px-4 py-3 pr-12 rounded-xl bg-slate-800 border border-white/10 text-white placeholder-slate-500
+                                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                                       transition-all duration-200"
+                            />
+                            <!-- Toggle show/hide password -->
+                            <button
+                                type="button"
+                                id="toggle-password"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-1"
+                                title="Tampilkan/sembunyikan password"
+                            >
+                                <svg
+                                    id="eye-icon"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                    ></path>
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                    ></path>
+                                </svg>
+                                <svg
+                                    id="eye-off-icon"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-5 h-5 hidden"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button
+                        type="submit"
+                        id="btn-login"
+                        class="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl
+                               bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-base
+                               transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25
+                               disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                    >
+                        <svg
+                            id="btn-icon"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                            ></path>
+                        </svg>
+                        <span id="btn-login-text">Masuk</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Back to site -->
+            <p class="text-center text-sm text-slate-500 mt-6">
+                <a href="/" class="hover:text-slate-300 transition-colors"
+                    >← Kembali ke situs</a
+                >
+            </p>
+        </div>
+    </div>
+</Layout>
+
+<script>
+    const form = document.getElementById("login-form") as HTMLFormElement;
+    const alertEl = document.getElementById("login-alert") as HTMLDivElement;
+    const btnLogin = document.getElementById("btn-login") as HTMLButtonElement;
+    const btnText = document.getElementById(
+        "btn-login-text",
+    ) as HTMLSpanElement;
+    const nextUrl = (document.getElementById("next-url") as HTMLInputElement)
+        .value;
+
+    // ── Toggle password visibility ─────────────────────────────────────────────
+    const toggleBtn = document.getElementById("toggle-password");
+    const passwordInput = document.getElementById(
+        "password",
+    ) as HTMLInputElement;
+    const eyeIcon = document.getElementById("eye-icon");
+    const eyeOffIcon = document.getElementById("eye-off-icon");
+
+    toggleBtn?.addEventListener("click", () => {
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+        eyeIcon?.classList.toggle("hidden", isPassword);
+        eyeOffIcon?.classList.toggle("hidden", !isPassword);
+    });
+
+    // ── Show alert helper ──────────────────────────────────────────────────────
+    function showAlert(msg: string) {
+        alertEl.textContent = msg;
+        alertEl.classList.remove("hidden");
+    }
+
+    function hideAlert() {
+        alertEl.classList.add("hidden");
+    }
+
+    // ── Submit login ───────────────────────────────────────────────────────────
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        hideAlert();
+
+        const username = (
+            document.getElementById("username") as HTMLInputElement
+        ).value.trim();
+        const password = (
+            document.getElementById("password") as HTMLInputElement
+        ).value;
+
+        if (!username || !password) {
+            showAlert("Username dan password wajib diisi.");
+            return;
+        }
+
+        btnLogin.disabled = true;
+        btnText.textContent = "Memproses...";
+
+        try {
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                // Redirect ke halaman tujuan (atau /berita jika tidak ada)
+                window.location.href = nextUrl || "/berita";
+            } else {
+                showAlert(result.error ?? "Login gagal. Coba lagi.");
+            }
+        } catch {
+            showAlert("Terjadi kesalahan jaringan. Coba lagi.");
+        } finally {
+            btnLogin.disabled = false;
+            btnText.textContent = "Masuk";
+        }
+    });
+
+    // Clear alert on input
+    document.getElementById("username")?.addEventListener("input", hideAlert);
+    document.getElementById("password")?.addEventListener("input", hideAlert);
+</script>

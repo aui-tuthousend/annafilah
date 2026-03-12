@@ -111,7 +111,7 @@ export async function getNewsById(
     return toResponse(row, images.map(img => img.url));
 }
 
-// ─── READ: Get single news by slug ────────────────────────────────────────────
+// ─── READ: Get single news by slug (Public: only published) ──────────────────
 export async function getNewsBySlug(
     slug: string
 ): Promise<NewsResponse | null> {
@@ -119,6 +119,27 @@ export async function getNewsBySlug(
         .select()
         .from(news)
         .where(and(eq(news.slug, slug), eq(news.isPublished, true)))
+        .limit(1);
+
+    if (!row) return null;
+
+    const images = await db
+        .select()
+        .from(newsImages)
+        .where(eq(newsImages.newsId, row.id))
+        .orderBy(newsImages.sortOrder);
+
+    return toResponse(row, images.map(img => img.url));
+}
+
+// ─── READ: Get single news by slug (Admin: including draft) ──────────────────
+export async function getNewsBySlugAdmin(
+    slug: string
+): Promise<NewsResponse | null> {
+    const [row] = await db
+        .select()
+        .from(news)
+        .where(eq(news.slug, slug))
         .limit(1);
 
     if (!row) return null;

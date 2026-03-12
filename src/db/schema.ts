@@ -86,6 +86,31 @@ export const newsImages = pgTable("news_images", {
         .notNull(),
 });
 
+// ─── Users ────────────────────────────────────────────────────────────────────
+// Admin users yang dapat login ke panel manajemen konten
+export const users = pgTable("users", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    username: text("username").notNull().unique(),
+    passwordHash: text("password_hash").notNull(),
+    role: text("role").notNull().default("admin"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+        .defaultNow()
+        .notNull(),
+});
+
+// ─── Sessions ─────────────────────────────────────────────────────────────────
+// Session token yang disimpan di database; ID-nya juga disimpan dalam cookie
+export const sessions = pgTable("sessions", {
+    id: text("id").primaryKey(),             // 64-char hex random token
+    userId: uuid("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+        .defaultNow()
+        .notNull(),
+});
+
 // ─── Inferred Types ───────────────────────────────────────────────────────────
 export type Article = typeof articles.$inferSelect;
 export type NewArticle = typeof articles.$inferInsert;
@@ -98,3 +123,9 @@ export type NewNews = typeof news.$inferInsert;
 
 export type NewsImage = typeof newsImages.$inferSelect;
 export type NewNewsImage = typeof newsImages.$inferInsert;
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+
+export type Session = typeof sessions.$inferSelect;
+export type NewSession = typeof sessions.$inferInsert;

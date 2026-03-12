@@ -5,6 +5,9 @@ import { getAllPrograms } from "./-api/repository";
 export const prerender = false;
 
 const programsList = await getAllPrograms({ isPublished: true, limit: 100 });
+
+// AUTH: Ambil status login dari context.locals (optimal: tanpa query DB tambahan)
+const isLoggedIn = !!Astro.locals.username;
 ---
 
 <Layout
@@ -40,25 +43,30 @@ const programsList = await getAllPrograms({ isPublished: true, limit: 100 });
                             bisnis Anda saat ini.
                         </p>
                     </div>
-                    <a
-                        href="/program/create"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="w-4 h-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 4v16m8-8H4"></path>
-                        </svg>
-                        Tambah Program
-                    </a>
+                    {
+                        isLoggedIn && (
+                            <a
+                                href="/program/create"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M12 4v16m8-8H4"
+                                    />
+                                </svg>
+                                Tambah Program
+                            </a>
+                        )
+                    }
                 </div>
             </div>
 

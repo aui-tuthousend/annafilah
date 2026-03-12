@@ -1,0 +1,494 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { getNewsBySlugAdmin } from "../-api/repository";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+    return Astro.redirect("/berita");
+}
+
+const newsItem = await getNewsBySlugAdmin(slug);
+
+if (!newsItem) {
+    return Astro.redirect("/404");
+}
+
+const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
+---
+
+<Layout
+    title={`Edit Berita: ${newsItem.title} – Yayasan Annafilah`}
+    description={`Form untuk mengedit berita "${newsItem.title}" di Yayasan Annafilah.`}
+>
+    <div class="min-h-screen bg-slate-950 pt-28 pb-20 px-6">
+        <div class="max-w-3xl mx-auto">
+            <!-- Header -->
+            <div class="mb-10">
+                <nav
+                    class="text-sm text-slate-500 mb-6 flex items-center gap-2"
+                >
+                    <a href="/" class="hover:text-indigo-400 transition-colors"
+                        >Beranda</a
+                    >
+                    <span>/</span>
+                    <a
+                        href="/berita"
+                        class="hover:text-indigo-400 transition-colors"
+                        >Berita</a
+                    >
+                    <span>/</span>
+                    <span class="text-slate-300">Edit Berita</span>
+                </nav>
+                <p
+                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-2"
+                >
+                    Manajemen Konten
+                </p>
+                <h1 class="text-4xl font-extrabold text-white">Edit Berita</h1>
+                <p class="text-slate-400 mt-2">
+                    Perbarui informasi berita di bawah ini.
+                </p>
+            </div>
+
+            <!-- Alert area -->
+            <div
+                id="form-alert"
+                class="hidden mb-6 p-4 rounded-xl text-sm font-medium"
+            >
+            </div>
+
+            <!-- Form -->
+            <form
+                id="edit-berita-form"
+                novalidate
+                class="space-y-6"
+                data-id={newsItem.id}
+            >
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        Judul Berita <span class="text-red-400">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        required
+                        maxlength="100"
+                        value={newsItem.title}
+                        placeholder="Tulis judul berita yang menarik..."
+                        class="form-input"
+                    />
+                    <p class="form-hint text-right">
+                        <span id="title-count">{newsItem.title.length}</span
+                        >/100
+                    </p>
+                </div>
+
+                <!-- Excerpt -->
+                <div class="form-group">
+                    <label for="excerpt" class="form-label">
+                        Ringkasan <span class="text-red-400">*</span>
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(ditampilkan di listing)</span
+                        >
+                    </label>
+                    <textarea
+                        id="excerpt"
+                        name="excerpt"
+                        required
+                        maxlength="300"
+                        rows="3"
+                        placeholder="Tuliskan ringkasan singkat berita ini..."
+                        class="form-input resize-none"
+                        >{newsItem.excerpt}</textarea
+                    >
+                    <p class="form-hint text-right">
+                        <span id="excerpt-count">{newsItem.excerpt.length}</span
+                        >/300
+                    </p>
+                </div>
+
+                <!-- Category + Location -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="category" class="form-label">
+                            Kategori <span class="text-red-400">*</span>
+                        </label>
+                        <select
+                            id="category"
+                            name="category"
+                            required
+                            class="form-input"
+                        >
+                            <option value="" disabled>Pilih kategori...</option>
+                            {
+                                categories.map((cat) => (
+                                    <option
+                                        value={cat}
+                                        selected={newsItem.category === cat}
+                                    >
+                                        {cat}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="location" class="form-label">
+                            Lokasi <span class="text-red-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="location"
+                            name="location"
+                            required
+                            value={newsItem.location}
+                            placeholder="Lokasi kegiatan..."
+                            class="form-input"
+                        />
+                    </div>
+                </div>
+
+                <!-- Author -->
+                <div class="form-group">
+                    <label for="author" class="form-label">
+                        Penulis <span class="text-red-400">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="author"
+                        name="author"
+                        required
+                        value={newsItem.author}
+                        placeholder="Nama penulis..."
+                        class="form-input"
+                    />
+                </div>
+
+                <!-- Thumbnail Image -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Gambar Utama
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(kosongkan jika tidak ingin mengganti)</span
+                        >
+                    </label>
+
+                    <div
+                        id="upload-zone"
+                        class="relative cursor-pointer group/zone"
+                    >
+                        <input
+                            type="file"
+                            id="images"
+                            name="images"
+                            accept="image/*"
+                            class="sr-only"
+                        />
+
+                        <div id="img-preview" class="relative">
+                            <img
+                                id="img-preview-src"
+                                src={newsItem.image}
+                                alt="Current cover"
+                                class="w-full max-h-64 object-cover rounded-2xl border border-white/10 group-hover/zone:border-indigo-500/50 transition-colors"
+                            />
+                            <div
+                                class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/40 opacity-0 group-hover/zone:opacity-100 transition-opacity rounded-2xl"
+                            >
+                                <p class="text-white font-bold">
+                                    Ganti Gambar Cover
+                                </p>
+                                <p class="text-slate-300 text-xs mt-1">
+                                    Klik untuk memilih gambar baru
+                                </p>
+                            </div>
+                            <div class="absolute bottom-3 left-3">
+                                <span
+                                    class="px-2 py-1 rounded-full bg-indigo-600/90 text-white text-xs font-semibold backdrop-blur-sm"
+                                >
+                                    Cover Saat Ini
+                                </span>
+                            </div>
+                            <button
+                                type="button"
+                                id="btn-remove-img"
+                                class="hidden absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-400 text-white text-sm font-bold shadow-lg transition-opacity"
+                                title="Batalkan penggantian"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="form-group">
+                    <label for="content" class="form-label">
+                        Konten Berita <span class="text-red-400">*</span>
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(mendukung HTML)</span
+                        >
+                    </label>
+
+                    <div
+                        class="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-900/50 border border-white/5 mb-1"
+                    >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="p"
+                            title="Paragraph">P</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn font-bold"
+                            data-tag="strong"
+                            title="Bold">B</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn italic"
+                            data-tag="em"
+                            title="Italic">I</button
+                        >
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="h2"
+                            title="Heading 2">H2</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="h3"
+                            title="Heading 3">H3</button
+                        >
+                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="ul"
+                            title="Unordered List">UL</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="li"
+                            title="List Item">LI</button
+                        >
+                    </div>
+
+                    <textarea
+                        id="content"
+                        name="content"
+                        required
+                        rows="16"
+                        placeholder="Tulis konten berita di sini..."
+                        class="form-input resize-y font-mono text-sm"
+                        >{newsItem.content}</textarea
+                    >
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4 pt-2">
+                    <button
+                        type="submit"
+                        id="btn-submit"
+                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span id="btn-submit-text">Simpan Perubahan</span>
+                    </button>
+                    <a
+                        href="/berita"
+                        class="px-6 py-3.5 rounded-xl border border-white/10 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-base transition-colors"
+                    >
+                        Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    @reference "../../../styles/global.css";
+    .form-group {
+        @apply flex flex-col gap-2;
+    }
+    .form-label {
+        @apply text-sm font-semibold text-slate-200;
+    }
+    .form-input {
+        @apply w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all;
+    }
+    .form-hint {
+        @apply text-xs text-slate-500;
+    }
+    .html-tag-btn {
+        @apply px-2.5 py-1 text-[10px] font-bold rounded bg-slate-800 text-slate-400 border border-white/5
+               hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all;
+    }
+</style>
+
+<script>
+    const form = document.getElementById("edit-berita-form") as HTMLFormElement;
+    const alertEl = document.getElementById("form-alert");
+    const submitBtn = document.getElementById(
+        "btn-submit",
+    ) as HTMLButtonElement;
+    const submitText = document.getElementById("btn-submit-text");
+    const titleInput = document.getElementById("title") as HTMLInputElement;
+    const titleCount = document.getElementById("title-count");
+    const excerptEl = document.getElementById("excerpt") as HTMLTextAreaElement;
+    const excerptCount = document.getElementById("excerpt-count");
+
+    const imgInput = document.getElementById("images") as HTMLInputElement;
+    const imgPreviewSrc = document.getElementById(
+        "img-preview-src",
+    ) as HTMLImageElement;
+    const btnRemoveImg = document.getElementById("btn-remove-img");
+    const initialImgSrc = imgPreviewSrc?.src;
+
+    const newsId = form?.dataset.id;
+
+    let selectedFile: File | null = null;
+    let previewUrl: string | null = null;
+
+    // ── Counters ──────────────────────────────────────────────────────────────
+    titleInput?.addEventListener("input", () => {
+        if (titleCount)
+            titleCount.textContent = String(titleInput.value.length);
+    });
+    excerptEl?.addEventListener("input", () => {
+        if (excerptCount)
+            excerptCount.textContent = String(excerptEl.value.length);
+    });
+
+    // ── Image Handling ────────────────────────────────────────────────────────
+    imgInput?.addEventListener("change", (e) => {
+        const files = (e.target as HTMLInputElement).files;
+        if (files && files[0]) {
+            selectedFile = files[0];
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            previewUrl = URL.createObjectURL(selectedFile);
+            if (imgPreviewSrc) imgPreviewSrc.src = previewUrl;
+            btnRemoveImg?.classList.remove("hidden");
+        }
+    });
+
+    btnRemoveImg?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectedFile = null;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+        if (imgPreviewSrc) imgPreviewSrc.src = initialImgSrc;
+        if (imgInput) imgInput.value = "";
+        btnRemoveImg?.classList.add("hidden");
+    });
+
+    const uploadZone = document.getElementById("upload-zone");
+    uploadZone?.addEventListener("click", () => imgInput?.click());
+
+    // ── Submit ────────────────────────────────────────────────────────────────
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!alertEl || !newsId) return;
+        alertEl.classList.add("hidden");
+
+        const raw = new FormData(form);
+        const title = (raw.get("title") as string).trim();
+
+        if (!title) {
+            showAlert("Judul wajib diisi.", "error");
+            return;
+        }
+
+        submitBtn.disabled = true;
+        if (submitText) submitText.textContent = "Menyimpan...";
+
+        const payload = new FormData();
+        payload.append("title", title);
+        payload.append("excerpt", (raw.get("excerpt") as string).trim());
+        payload.append("category", (raw.get("category") as string).trim());
+        payload.append("author", (raw.get("author") as string).trim());
+        payload.append("location", (raw.get("location") as string).trim());
+        payload.append("content", (raw.get("content") as string).trim());
+
+        if (selectedFile) {
+            // Note: used "images" key to match API expectation for multiple files if needed,
+            // but for now we send one as cover replacement.
+            payload.append("images", selectedFile);
+        }
+
+        try {
+            const res = await fetch(`/api/berita/${newsId}`, {
+                method: "PUT",
+                body: payload,
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                showAlert("✓ Berita berhasil diperbarui!", "success");
+                setTimeout(() => {
+                    window.location.href = "/berita";
+                }, 1500);
+            } else {
+                showAlert(result.error ?? "Gagal memperbarui berita.", "error");
+            }
+        } catch {
+            showAlert("Terjadi kesalahan jaringan.", "error");
+        } finally {
+            submitBtn.disabled = false;
+            if (submitText) submitText.textContent = "Simpan Perubahan";
+        }
+    });
+
+    function showAlert(msg: string, type: "success" | "error") {
+        if (!alertEl) return;
+        alertEl.textContent = msg;
+        alertEl.className =
+            type === "success"
+                ? "mb-6 p-4 rounded-xl text-sm font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block"
+                : "mb-6 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400 block";
+    }
+
+    // ── Content Shortcuts ──
+    const contentTextarea = document.getElementById(
+        "content",
+    ) as HTMLTextAreaElement;
+    document.querySelectorAll(".html-tag-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const tag = (btn as HTMLElement).dataset.tag;
+            if (!tag || !contentTextarea) return;
+            const start = contentTextarea.selectionStart;
+            const end = contentTextarea.selectionEnd;
+            const text = contentTextarea.value;
+            const selectedText = text.substring(start, end);
+            let insertion = `<${tag}>${selectedText}</${tag}>`;
+            if (tag === "br") insertion = "<br>\n";
+            contentTextarea.value =
+                text.substring(0, start) + insertion + text.substring(end);
+            contentTextarea.focus();
+        });
+    });
+</script>

@@ -1,5 +1,9 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+
+// Middleware sudah memvalidasi login sebelum halaman ini dirender.
+// Kita ambil username dari locals untuk pre-fill field "Penulis".
+const authorName = Astro.locals.username ?? "";
 ---
 
 <Layout
@@ -120,6 +124,7 @@ import Layout from "../../layouts/Layout.astro";
                             id="author"
                             name="author"
                             required
+                            value={authorName}
                             placeholder="Nama penulis..."
                             class="form-input"
                         />

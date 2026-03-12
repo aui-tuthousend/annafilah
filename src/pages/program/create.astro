@@ -1,5 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+
+// Middleware sudah memvalidasi login sebelum halaman ini dirender.
+const _user = Astro.locals.username;
 ---
 
 <Layout
