@@ -25,6 +25,8 @@ export const PUT: APIRoute = async ({ params, request }) => {
     try {
         const contentType = request.headers.get("Content-Type") || "";
         let body: UpdateNewsDto = {};
+        let existingImages: string[] = [];
+        let newImageFiles: File[] = [];
 
         if (contentType.includes("multipart/form-data")) {
             const formData = await request.formData();
@@ -40,26 +42,42 @@ export const PUT: APIRoute = async ({ params, request }) => {
                 programId: formData.has("programId") ? (formData.get("programId") as string)?.trim() || null : undefined,
             };
 
-            // Handle Image Upload during edit
-            const imageFile = formData.get("images") as File | null; // Note: Create used "images" multiple, we just handle one cover for now in edit or multiple if needed
-            if (imageFile && imageFile.size > 0 && imageFile.type.startsWith("image/")) {
-                const finalSlug = body.slug || (await getNewsById(id))?.slug;
-                if (finalSlug) {
-                    const { saveAsWebP } = await import("../../../lib/image");
-                    const path = await import("node:path");
-                    const newsDir = path.join(process.cwd(), "public", "uploads", "news", finalSlug);
-                    body.image = await saveAsWebP(imageFile, newsDir, "cover");
+            // Get existing images to keep
+            existingImages = formData.getAll("keep_images") as string[];
 
-                    // Note: Here we update the main cover image. 
-                    // To handle multiple gallery images update, it would need more complex logic.
+            // Get new images to upload
+            newImageFiles = (formData.getAll("new_images") as File[]).filter(f => f && f.size > 0);
+
+            const newsData = await getNewsById(id);
+            if (!newsData) return new Response(JSON.stringify({ success: false, error: "Berita tidak ditemukan." }), { status: 404 });
+
+            const finalSlug = body.slug || newsData.slug;
+            const finalImages = [...existingImages];
+
+            if (newImageFiles.length > 0) {
+                const { saveAsWebP } = await import("../../../lib/image");
+                const path = await import("node:path");
+                const newsDir = path.join(process.cwd(), "public", "uploads", "news", finalSlug);
+
+                for (let i = 0; i < newImageFiles.length; i++) {
+                    const timestamp = Date.now();
+                    const filename = `img-${timestamp}-${i}`;
+                    const url = await saveAsWebP(newImageFiles[i], newsDir, filename);
+                    finalImages.push(url);
                 }
             }
+
+            // Update main cover to the first image in the list if it changed
+            if (finalImages.length > 0) {
+                body.image = finalImages[0];
+            }
+
+            // Sync images in DB
+            const { syncNewsImages } = await import("../../berita/-api/repository");
+            await syncNewsImages(id, finalImages);
+
         } else {
             body = (await request.json()) as UpdateNewsDto;
-        }
-
-        if (Object.keys(body).length === 0) {
-            return new Response(JSON.stringify({ success: false, error: "Tidak ada data yang diperbarui." }), { status: 400 });
         }
 
         const data = await updateNews(id, body);

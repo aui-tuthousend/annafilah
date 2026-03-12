@@ -169,60 +169,91 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                     />
                 </div>
 
-                <!-- Thumbnail Image -->
+                <!-- Gallery Management -->
                 <div class="form-group">
                     <label class="form-label">
-                        Gambar Utama
+                        Galeri Gambar Berita <span class="text-red-400">*</span>
                         <span class="text-slate-500 font-normal text-xs ml-2"
-                            >(kosongkan jika tidak ingin mengganti)</span
+                            >(Gambar pertama akan menjadi Cover)</span
                         >
                     </label>
 
                     <div
-                        id="upload-zone"
-                        class="relative cursor-pointer group/zone"
+                        id="gallery-container"
+                        class="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-slate-900/50 border border-white/5"
                     >
+                        {
+                            newsItem.images.map((url, index) => (
+                                <div
+                                    class="gallery-item relative aspect-video group"
+                                    data-url={url}
+                                    data-type="existing"
+                                >
+                                    <img
+                                        src={url}
+                                        class="w-full h-full object-cover rounded-xl border border-white/10"
+                                    />
+                                    <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
+                                        <button
+                                            type="button"
+                                            class="btn-remove-gallery p-1.5 rounded-lg bg-red-500 text-white hover:bg-red-400 shadow-lg"
+                                            title="Hapus Gambar"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                class="w-4 h-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    {index === 0 && (
+                                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-indigo-600 text-[10px] font-bold text-white uppercase tracking-wider">
+                                            Cover
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        }
+
+                        <!-- Add Button -->
+                        <button
+                            type="button"
+                            id="btn-add-gallery"
+                            class="aspect-video rounded-xl border-2 border-dashed border-white/10 hover:border-indigo-500/50 hover:bg-indigo-500/5 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-indigo-400 transition-all"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-6 h-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            <span class="text-xs font-semibold"
+                                >Tambah Foto</span
+                            >
+                        </button>
                         <input
                             type="file"
-                            id="images"
-                            name="images"
+                            id="new-images-input"
+                            multiple
                             accept="image/*"
                             class="sr-only"
                         />
-
-                        <div id="img-preview" class="relative">
-                            <img
-                                id="img-preview-src"
-                                src={newsItem.image}
-                                alt="Current cover"
-                                class="w-full max-h-64 object-cover rounded-2xl border border-white/10 group-hover/zone:border-indigo-500/50 transition-colors"
-                            />
-                            <div
-                                class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/40 opacity-0 group-hover/zone:opacity-100 transition-opacity rounded-2xl"
-                            >
-                                <p class="text-white font-bold">
-                                    Ganti Gambar Cover
-                                </p>
-                                <p class="text-slate-300 text-xs mt-1">
-                                    Klik untuk memilih gambar baru
-                                </p>
-                            </div>
-                            <div class="absolute bottom-3 left-3">
-                                <span
-                                    class="px-2 py-1 rounded-full bg-indigo-600/90 text-white text-xs font-semibold backdrop-blur-sm"
-                                >
-                                    Cover Saat Ini
-                                </span>
-                            </div>
-                            <button
-                                type="button"
-                                id="btn-remove-img"
-                                class="hidden absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-400 text-white text-sm font-bold shadow-lg transition-opacity"
-                                title="Batalkan penggantian"
-                            >
-                                ✕
-                            </button>
-                        </div>
                     </div>
                 </div>
 
@@ -361,18 +392,109 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
     const titleCount = document.getElementById("title-count");
     const excerptEl = document.getElementById("excerpt") as HTMLTextAreaElement;
     const excerptCount = document.getElementById("excerpt-count");
-
-    const imgInput = document.getElementById("images") as HTMLInputElement;
-    const imgPreviewSrc = document.getElementById(
-        "img-preview-src",
-    ) as HTMLImageElement;
-    const btnRemoveImg = document.getElementById("btn-remove-img");
-    const initialImgSrc = imgPreviewSrc?.src;
-
     const newsId = form?.dataset.id;
 
-    let selectedFile: File | null = null;
-    let previewUrl: string | null = null;
+    // ── Gallery Management ──────────────────────────────────────────────────
+    const galleryContainer = document.getElementById("gallery-container");
+    const btnAddGallery = document.getElementById("btn-add-gallery");
+    const newImagesInput = document.getElementById(
+        "new-images-input",
+    ) as HTMLInputElement;
+
+    // State to track images
+    interface GalleryItem {
+        id: string;
+        url: string;
+        file?: File;
+        isExisting: boolean;
+    }
+
+    let galleryItems: GalleryItem[] = [];
+
+    // Initialize with existing images
+    document.querySelectorAll(".gallery-item").forEach((item) => {
+        const url = (item as HTMLElement).dataset.url!;
+        galleryItems.push({
+            id: Math.random().toString(36),
+            url,
+            isExisting: true,
+        });
+    });
+
+    function renderGallery() {
+        if (!galleryContainer || !btnAddGallery) return;
+
+        // Clear all except add button
+        const items = galleryContainer.querySelectorAll(".gallery-item");
+        items.forEach((el) => el.remove());
+
+        galleryItems.forEach((item, index) => {
+            const div = document.createElement("div");
+            div.className =
+                "gallery-item relative aspect-video group animate-in fade-in zoom-in duration-300";
+            div.innerHTML = `
+                <img src="${item.url}" class="w-full h-full object-cover rounded-xl border border-white/10" />
+                <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
+                    <button type="button" class="btn-remove-item p-1.5 rounded-lg bg-red-500 text-white hover:bg-red-400 shadow-lg" title="Hapus Gambar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+                ${
+                    index === 0
+                        ? `
+                    <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-indigo-600 text-[10px] font-bold text-white uppercase tracking-wider">
+                        Cover
+                    </div>
+                `
+                        : ""
+                }
+            `;
+
+            div.querySelector(".btn-remove-item")?.addEventListener(
+                "click",
+                () => {
+                    if (!item.isExisting && item.url)
+                        URL.revokeObjectURL(item.url);
+                    galleryItems = galleryItems.filter((i) => i.id !== item.id);
+                    renderGallery();
+                },
+            );
+
+            galleryContainer.insertBefore(div, btnAddGallery);
+        });
+    }
+
+    btnAddGallery?.addEventListener("click", () => newImagesInput?.click());
+
+    newImagesInput?.addEventListener("change", (e) => {
+        const files = (e.target as HTMLInputElement).files;
+        if (!files) return;
+
+        for (const file of Array.from(files)) {
+            const url = URL.createObjectURL(file);
+            galleryItems.push({
+                id: Math.random().toString(36),
+                url,
+                file,
+                isExisting: false,
+            });
+        }
+        renderGallery();
+        newImagesInput.value = ""; // Reset
+    });
+
+    // Initial event delegation for existing buttons
+    galleryContainer?.addEventListener("click", (e) => {
+        const btn = (e.target as HTMLElement).closest(".btn-remove-gallery");
+        if (btn) {
+            const parent = btn.closest(".gallery-item") as HTMLElement;
+            const url = parent.dataset.url;
+            galleryItems = galleryItems.filter((i) => i.url !== url);
+            renderGallery();
+        }
+    });
 
     // ── Counters ──────────────────────────────────────────────────────────────
     titleInput?.addEventListener("input", () => {
@@ -383,31 +505,6 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
         if (excerptCount)
             excerptCount.textContent = String(excerptEl.value.length);
     });
-
-    // ── Image Handling ────────────────────────────────────────────────────────
-    imgInput?.addEventListener("change", (e) => {
-        const files = (e.target as HTMLInputElement).files;
-        if (files && files[0]) {
-            selectedFile = files[0];
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            previewUrl = URL.createObjectURL(selectedFile);
-            if (imgPreviewSrc) imgPreviewSrc.src = previewUrl;
-            btnRemoveImg?.classList.remove("hidden");
-        }
-    });
-
-    btnRemoveImg?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        selectedFile = null;
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = null;
-        if (imgPreviewSrc) imgPreviewSrc.src = initialImgSrc;
-        if (imgInput) imgInput.value = "";
-        btnRemoveImg?.classList.add("hidden");
-    });
-
-    const uploadZone = document.getElementById("upload-zone");
-    uploadZone?.addEventListener("click", () => imgInput?.click());
 
     // ── Submit ────────────────────────────────────────────────────────────────
     form?.addEventListener("submit", async (e) => {
@@ -423,6 +520,11 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
             return;
         }
 
+        if (galleryItems.length === 0) {
+            showAlert("Minimal satu gambar wajib ada.", "error");
+            return;
+        }
+
         submitBtn.disabled = true;
         if (submitText) submitText.textContent = "Menyimpan...";
 
@@ -434,11 +536,19 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
         payload.append("location", (raw.get("location") as string).trim());
         payload.append("content", (raw.get("content") as string).trim());
 
-        if (selectedFile) {
-            // Note: used "images" key to match API expectation for multiple files if needed,
-            // but for now we send one as cover replacement.
-            payload.append("images", selectedFile);
-        }
+        // Add existing images to keep
+        galleryItems
+            .filter((i) => i.isExisting)
+            .forEach((i) => {
+                payload.append("keep_images", i.url);
+            });
+
+        // Add new images to upload
+        galleryItems
+            .filter((i) => !i.isExisting)
+            .forEach((i) => {
+                if (i.file) payload.append("new_images", i.file);
+            });
 
         try {
             const res = await fetch(`/api/berita/${newsId}`, {

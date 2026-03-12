@@ -205,6 +205,26 @@ export async function updateNews(
     return row ? toResponse(row) : null;
 }
 
+// ─── IMAGES: Sync images for a news item (Delete all then insert new list) ────
+export async function syncNewsImages(
+    newsId: string,
+    urls: string[]
+): Promise<void> {
+    // 1. Delete all existing images for this news
+    await db.delete(newsImages).where(eq(newsImages.newsId, newsId));
+
+    if (urls.length === 0) return;
+
+    // 2. Insert new list
+    const values = urls.map((url, index) => ({
+        newsId,
+        url,
+        sortOrder: index, // 0 is usually cover
+    }));
+
+    await db.insert(newsImages).values(values);
+}
+
 // ─── IMAGES: Add multiple images for a news item ──────────────────────────────
 export async function addNewsImages(
     newsId: string,
