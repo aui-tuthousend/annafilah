@@ -1,13 +1,16 @@
 ---
 const partners = [
-    { name: "Global Tech", icon: "🌐" },
-    { name: "Eco Builders", icon: "🌱" },
-    { name: "Future Finance", icon: "💰" },
-    { name: "Smart Solutions", icon: "🧠" },
-    { name: "Apex Design", icon: "🎨" },
-    { name: "Data Core", icon: "💾" },
-    { name: "Cloud Sync", icon: "☁️" },
-    { name: "Nova Marketing", icon: "🚀" },
+    { name: "Daycare Bintang Kecil", logo: "/public/logos/bintangkecil.jpg" },
+    { name: "Nurul Hayat", logo: "/public/logos/nh.jpg" },
+    { name: "PLN", logo: "/public/logos/pln.png" },
+    { name: "Pajak", logo: "/public/logos/djp.jpg" },
+    { name: "Yatim Mandiri", logo: "/public/logos/ym.png" },
+    { name: "Brownis Amanda", logo: "/public/logos/amanda.webp" },
+    { name: "RSIA Cempaka Putih", logo: "/public/logos/rsia.webp" },
+    { name: "mitramas infosys global", logo: "/public/logos/mig.png" },
+    { name: "Asia Cahaya Teknik Prima", logo: "/public/logos/actp.jpg" },
+    { name: "Coffee 57 Gresik", logo: "/public/logos/57.jpg" },
+    { name: "swk gayungan", logo: "/public/logos/swk.jpg" },
 ];
 ---
 
@@ -20,32 +23,31 @@ const partners = [
         </p>
     </div>
 
-    <div class="flex relative">
-        <!-- First row of logos -->
-        <div class="flex space-x-12 animate-marquee whitespace-nowrap">
+    <div class="marquee-wrapper">
+        <div class="marquee-track">
+            <!-- Original set -->
             {
                 partners.map((p) => (
-                    <div class="flex items-center space-x-3 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                        <span class="text-3xl">{p.icon}</span>
-                        <span class="text-xl font-bold text-slate-300 tracking-tight">
-                            {p.name}
-                        </span>
+                    <div class="marquee-item">
+                        <img
+                            src={p.logo}
+                            alt={p.name}
+                            class="logo-img"
+                            loading="lazy"
+                        />
                     </div>
                 ))
             }
-        </div>
-        <!-- Duplicated row for seamless loop -->
-        <div
-            class="flex space-x-12 animate-marquee whitespace-nowrap ml-12"
-            aria-hidden="true"
-        >
+            <!-- Duplicate set for seamless loop -->
             {
                 partners.map((p) => (
-                    <div class="flex items-center space-x-3 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                        <span class="text-3xl">{p.icon}</span>
-                        <span class="text-xl font-bold text-slate-300 tracking-tight">
-                            {p.name}
-                        </span>
+                    <div class="marquee-item" aria-hidden="true">
+                        <img
+                            src={p.logo}
+                            alt={p.name}
+                            class="logo-img"
+                            loading="lazy"
+                        />
                     </div>
                 ))
             }
@@ -54,21 +56,49 @@ const partners = [
 </section>
 
 <style>
+    .marquee-wrapper {
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .marquee-track {
+        display: flex;
+        width: max-content;
+        animation: marquee 30s linear infinite;
+    }
+
+    .marquee-wrapper:hover .marquee-track {
+        animation-play-state: paused;
+    }
+
+    .marquee-item {
+        display: flex;
+        align-items: center;
+        padding: 0 2rem;
+        filter: grayscale(100%);
+        opacity: 0.6;
+        transition:
+            filter 0.3s ease,
+            opacity 0.3s ease;
+    }
+
+    .marquee-item:hover {
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+
+    .logo-img {
+        height: 90px;
+        width: auto;
+        object-fit: contain;
+    }
+
     @keyframes marquee {
         0% {
             transform: translateX(0);
         }
         100% {
-            transform: translateX(-100%);
+            transform: translateX(-50%);
         }
-    }
-
-    .animate-marquee {
-        animation: marquee 30s linear infinite;
-    }
-
-    /* Pause on hover for better UX */
-    .flex:hover .animate-marquee {
-        animation-play-state: paused;
     }
 </style>
