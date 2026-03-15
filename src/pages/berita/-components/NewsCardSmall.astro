@@ -25,7 +25,7 @@ const {
 
 <a
     href={`/berita/${slug}`}
-    class="group block bg-slate-900 border border-white/5 rounded-xl overflow-hidden hover:border-indigo-500/30 hover:-translate-y-1 transition-all duration-300"
+    class="group block bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-teal-400/50 hover:-translate-y-1 transition-all duration-300 shadow-sm"
 >
     <!-- Thumbnail -->
     <div class="relative aspect-[16/9] overflow-hidden bg-slate-800">
@@ -37,7 +37,7 @@ const {
         />
         <div class="absolute top-3 inset-x-3 flex justify-between items-start">
             <span
-                class="px-2.5 py-1 rounded-full bg-indigo-600/90 backdrop-blur-sm text-white text-xs font-semibold uppercase tracking-wider"
+                class="px-2.5 py-1 rounded-full bg-teal-600/90 backdrop-blur-sm text-white text-xs font-semibold uppercase tracking-wider"
             >
                 {category}
             </span>
@@ -47,7 +47,7 @@ const {
                     <div class="flex gap-2">
                         <button
                             onclick={`event.preventDefault(); event.stopPropagation(); window.location.href='/berita/edit/${slug}'`}
-                            class="p-1.5 rounded-full bg-slate-950/80 text-white hover:text-indigo-400 border border-white/10 hover:border-indigo-500/50 backdrop-blur-sm transition-all group/edit"
+                            class="p-1.5 rounded-full bg-white/80 text-slate-700 hover:text-teal-600 border border-slate-200 hover:border-teal-400/50 backdrop-blur-sm transition-all group/edit"
                             title="Edit Berita"
                         >
                             <svg
@@ -94,7 +94,7 @@ const {
     <!-- Info -->
     <div class="p-4">
         <h3
-            class="text-white font-semibold text-sm leading-snug line-clamp-2 mb-3 group-hover:text-indigo-300 transition-colors"
+            class="text-slate-900 font-semibold text-sm leading-snug line-clamp-2 mb-3 group-hover:text-teal-600 transition-colors"
         >
             {title}
         </h3>

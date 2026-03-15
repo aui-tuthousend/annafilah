@@ -8,7 +8,7 @@ const images = [
 ];
 ---
 
-<section id="hero" class="pt-5 pb-0 px-4 md:px-0 bg-slate-950">
+<section id="hero" class="pt-5 pb-0 px-4 md:px-0 bg-slate-50">
     <!-- Image Slider -->
     <div
         class="max-w-[2000px] mx-auto overflow-hidden relative md:rounded-3xl shadow-2xl"
@@ -21,7 +21,7 @@ const images = [
             {
                 images.map((img, index) => (
                     <div
-                        class={`min-w-full relative aspect-[2.5/1] bg-slate-900 overflow-hidden ${index === 3 ? "hero-clone" : ""}`}
+                        class={`min-w-full relative aspect-[2.5/1] bg-slate-200 overflow-hidden ${index === 3 ? "hero-clone" : ""}`}
                     >
                         <img
                             src={img}
@@ -29,7 +29,7 @@ const images = [
                             class="w-full h-full object-cover select-none"
                             loading={index === 0 ? "eager" : "lazy"}
                         />
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-100/30 via-transparent to-transparent" />
                     </div>
                 ))
             }

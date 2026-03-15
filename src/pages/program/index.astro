@@ -14,14 +14,14 @@ const isLoggedIn = !!Astro.locals.username;
     title="Program – Annafilah"
     description="Temukan program kerja unggulan Yayasan Annafilah yang tepat untuk kebutuhan Anda."
 >
-    <section class="pt-32 pb-24 bg-slate-950 px-6">
+    <section class="pt-32 pb-24 bg-slate-50 px-6">
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="mb-16">
                 <nav
                     class="text-sm text-slate-500 mb-6 flex items-center gap-2"
                 >
-                    <a href="/" class="hover:text-indigo-400 transition-colors"
+                    <a href="/" class="hover:text-teal-600 transition-colors"
                         >Beranda</a
                     >
                     <span>/</span>
@@ -31,14 +31,14 @@ const isLoggedIn = !!Astro.locals.username;
                 <div class="flex items-center justify-between gap-4 flex-wrap">
                     <div>
                         <p
-                            class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+                            class="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-3"
                         >
                             Apa yang Kami Tawarkan
                         </p>
-                        <h1 class="text-5xl font-extrabold text-white mb-4">
+                        <h1 class="text-5xl font-extrabold text-slate-900 mb-4">
                             Semua Program
                         </h1>
-                        <p class="text-slate-400 text-lg max-w-xl">
+                        <p class="text-slate-600 text-lg max-w-xl">
                             Pilih program yang sesuai dengan tahap dan kebutuhan
                             bisnis Anda saat ini.
                         </p>
@@ -47,7 +47,7 @@ const isLoggedIn = !!Astro.locals.username;
                         isLoggedIn && (
                             <a
                                 href="/program/create"
-                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-teal-500/25 shrink-0"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +77,7 @@ const isLoggedIn = !!Astro.locals.username;
                         programsList.map((program) => (
                             <a
                                 href={`/program/${program.slug}`}
-                                class="group block border border-white/5 rounded-2xl overflow-hidden bg-slate-900 hover:border-indigo-500/30 hover:-translate-y-1 transition-all duration-300"
+                                class="group block border border-slate-200 rounded-2xl overflow-hidden bg-white hover:border-teal-400/50 hover:-translate-y-1 transition-all duration-300 shadow-sm"
                             >
                                 <div class="relative aspect-[16/9] overflow-hidden bg-slate-800">
                                     <img
@@ -92,7 +92,7 @@ const isLoggedIn = !!Astro.locals.username;
                                         <div class="absolute top-4 right-4 flex gap-2">
                                             <button
                                                 onclick={`event.preventDefault(); event.stopPropagation(); window.location.href='/program/edit/${program.slug}'`}
-                                                class="p-2 rounded-lg bg-slate-950/80 text-white hover:text-indigo-400 border border-white/10 hover:border-indigo-500/50 backdrop-blur-sm transition-all"
+                                                class="p-2 rounded-lg bg-white/80 text-slate-700 hover:text-teal-600 border border-slate-200 hover:border-teal-400/50 backdrop-blur-sm transition-all"
                                                 title="Edit Program"
                                             >
                                                 <svg
@@ -134,10 +134,10 @@ const isLoggedIn = !!Astro.locals.username;
                                     )}
                                 </div>
                                 <div class="p-6">
-                                    <h2 class="text-white font-bold text-xl group-hover:text-indigo-300 transition-colors leading-snug mb-3">
+                                    <h2 class="text-slate-900 font-bold text-xl group-hover:text-teal-600 transition-colors leading-snug mb-3">
                                         {program.name}
                                     </h2>
-                                    <span class="inline-flex items-center gap-1 text-indigo-400 text-sm font-semibold group-hover:gap-2 transition-all">
+                                    <span class="inline-flex items-center gap-1 text-teal-600 text-sm font-semibold group-hover:gap-2 transition-all">
                                         Lihat Program
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"

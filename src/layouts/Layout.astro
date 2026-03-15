@@ -59,19 +59,19 @@ const currentUser = Astro.locals.username
       rel="stylesheet"
     />
   </head>
-  <body class="font-[Inter,sans-serif]">
+  <body class="font-[Inter,sans-serif] bg-slate-50 text-slate-900">
     <!-- Navbar -->
     <!-- Navbar (DaisyUI) -->
     <header class="fixed top-0 left-0 right-0 z-50">
       <div
-        class="navbar bg-slate-950/80 backdrop-blur-md border-b border-white/5 px-6 md:px-12 w-full"
+        class="navbar bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 md:px-12 w-full shadow-sm"
       >
         <div class="navbar-start">
           <div class="dropdown">
             <div
               tabindex="0"
               role="button"
-              class="btn btn-ghost lg:hidden text-white"
+              class="btn btn-ghost lg:hidden text-slate-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,17 +89,21 @@ const currentUser = Astro.locals.username
             </div>
             <ul
               tabindex="0"
-              class="menu menu-sm dropdown-content bg-slate-900 rounded-box z-1 mt-3 w-52 p-2 shadow border border-white/10 text-slate-300"
+              class="menu menu-sm dropdown-content bg-white rounded-box z-1 mt-3 w-52 p-2 shadow-lg border border-slate-200 text-slate-700"
             >
-              <li><a href="/about" class="hover:text-white">Tentang</a></li>
-              <li><a href="/berita" class="hover:text-white">Berita</a></li>
-              <li><a href="/artikel" class="hover:text-white">Artikel</a></li>
-              <li><a href="/program" class="hover:text-white">Program</a></li>
+              <li><a href="/about" class="hover:text-teal-600">Tentang</a></li>
+              <li><a href="/berita" class="hover:text-teal-600">Berita</a></li>
+              <li>
+                <a href="/artikel" class="hover:text-teal-600">Artikel</a>
+              </li>
+              <li>
+                <a href="/program" class="hover:text-teal-600">Program</a>
+              </li>
             </ul>
           </div>
           <a
             href="/"
-            class="flex items-center gap-2 font-extrabold text-xl text-white tracking-tight"
+            class="flex items-center gap-2 font-extrabold text-xl text-slate-900 tracking-tight"
           >
             <img
               src="/logo.webp"
@@ -109,24 +113,24 @@ const currentUser = Astro.locals.username
           </a>
         </div>
         <div class="navbar-center hidden lg:flex">
-          <ul class="menu menu-horizontal px-1 text-slate-300 font-medium">
+          <ul class="menu menu-horizontal px-1 text-slate-600 font-medium">
             <li>
-              <a href="/about" class="hover:text-white transition-colors"
+              <a href="/about" class="hover:text-teal-600 transition-colors"
                 >Profil</a
               >
             </li>
             <li>
-              <a href="/berita" class="hover:text-white transition-colors"
+              <a href="/berita" class="hover:text-teal-600 transition-colors"
                 >Berita</a
               >
             </li>
             <li>
-              <a href="/artikel" class="hover:text-white transition-colors"
+              <a href="/artikel" class="hover:text-teal-600 transition-colors"
                 >Artikel</a
               >
             </li>
             <li>
-              <a href="/program" class="hover:text-white transition-colors"
+              <a href="/program" class="hover:text-teal-600 transition-colors"
                 >Program</a
               >
             </li>
@@ -137,16 +141,16 @@ const currentUser = Astro.locals.username
             currentUser ? (
               // ── Admin sedang login ───────────────────────────────────────────
               <div class="flex items-center gap-3">
-                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600/20 border border-indigo-500/30">
-                  <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span class="text-indigo-300 text-xs font-semibold">
+                <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-500/10 border border-teal-500/30">
+                  <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span class="text-teal-700 text-xs font-semibold">
                     {currentUser.username}
                   </span>
                 </div>
                 <form method="POST" action="/api/auth/logout">
                   <button
                     type="submit"
-                    class="btn btn-ghost btn-sm text-slate-400 hover:text-white hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 transition-all"
+                    class="btn btn-ghost btn-sm text-slate-500 hover:text-slate-900 hover:bg-red-500/10 border border-slate-200 hover:border-red-400/40 transition-all"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -170,7 +174,7 @@ const currentUser = Astro.locals.username
               // ── Belum login ──────────────────────────────────────────────────
               <a
                 href="#contact"
-                class="btn bg-indigo-600 hover:bg-indigo-500 border-none text-white btn-sm md:btn-md"
+                class="btn bg-teal-600 hover:bg-teal-500 border-none text-white btn-sm md:btn-md"
               >
                 Hubungi Kami
               </a>
@@ -180,17 +184,17 @@ const currentUser = Astro.locals.username
       </div>
     </header>
 
-    <main class="pt-16">
+    <main class="pt-16 md:pt-0">
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 border-t border-white/5 mt-10">
+    <footer class="bg-slate-100 border-t border-slate-200 mt-10">
       <div class="max-w-7xl mx-auto px-6 py-16">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <div
-              class="flex items-center gap-2 font-extrabold text-xl text-white mb-4"
+              class="flex items-center gap-2 font-extrabold text-xl text-slate-900 mb-4"
             >
               <img
                 src="/logo.webp"
@@ -198,39 +202,39 @@ const currentUser = Astro.locals.username
                 class="w-30 h-10 object-contain"
               />
             </div>
-            <p class="text-slate-400 text-sm leading-relaxed">
+            <p class="text-slate-500 text-sm leading-relaxed">
               Yayasan Annafilah adalah yayasan profesional yang berkomitmen
               menjadi wadah bagi para penghafal Al-Qur'an.
             </p>
           </div>
           <div>
-            <h3 class="font-semibold text-white mb-4">Navigasi</h3>
-            <ul class="space-y-2 text-sm text-slate-400">
+            <h3 class="font-semibold text-slate-800 mb-4">Navigasi</h3>
+            <ul class="space-y-2 text-sm text-slate-500">
               <li>
-                <a href="/about" class="hover:text-white transition-colors"
+                <a href="/about" class="hover:text-teal-600 transition-colors"
                   >Profil</a
                 >
               </li>
               <li>
-                <a href="/berita" class="hover:text-white transition-colors"
+                <a href="/berita" class="hover:text-teal-600 transition-colors"
                   >Berita</a
                 >
               </li>
               <li>
-                <a href="#contact" class="hover:text-white transition-colors"
+                <a href="#contact" class="hover:text-teal-600 transition-colors"
                   >Artikel</a
                 >
               </li>
               <li>
-                <a href="#contact" class="hover:text-white transition-colors"
+                <a href="#contact" class="hover:text-teal-600 transition-colors"
                   >Program</a
                 >
               </li>
             </ul>
           </div>
           <div>
-            <h3 class="font-semibold text-white mb-4">Kontak</h3>
-            <ul class="space-y-2 text-sm text-slate-400">
+            <h3 class="font-semibold text-slate-800 mb-4">Kontak</h3>
+            <ul class="space-y-2 text-sm text-slate-500">
               <li>📧 yayasanannafilah@gmail.com</li>
               <li>📞 +62 858-5433-3510</li>
               <li>📍 Surabaya, Indonesia</li>
@@ -238,7 +242,7 @@ const currentUser = Astro.locals.username
           </div>
         </div>
         <div
-          class="border-t border-white/5 mt-12 pt-8 text-center text-sm text-slate-500"
+          class="border-t border-slate-200 mt-12 pt-8 text-center text-sm text-slate-400"
         >
           <p>
             © {new Date().getFullYear()} Annafilah. Seluruh hak cipta dilindungi.

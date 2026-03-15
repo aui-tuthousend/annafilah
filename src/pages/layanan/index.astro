@@ -44,14 +44,14 @@ const colorBorder: Record<string, string> = {
     <section class="pt-32 pb-24 max-w-7xl mx-auto px-6">
         <div class="text-center mb-16">
             <p
-                class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+                class="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-3"
             >
                 Apa yang Kami Tawarkan
             </p>
-            <h1 class="text-5xl font-extrabold text-white mb-4">
+            <h1 class="text-5xl font-extrabold text-slate-900 mb-4">
                 Semua Layanan
             </h1>
-            <p class="text-slate-400 text-lg max-w-xl mx-auto">
+            <p class="text-slate-500 text-lg max-w-xl mx-auto">
                 Pilih layanan yang sesuai dengan tahap dan kebutuhan bisnis Anda
                 saat ini.
             </p>
@@ -62,22 +62,22 @@ const colorBorder: Record<string, string> = {
                 layananList.map((item) => (
                     <a
                         href={`/layanan/${item.slug}`}
-                        class={`group p-8 rounded-2xl border border-white/5 bg-white/2 ${colorBorder[item.color]} hover:bg-white/5 transition-all duration-300 block`}
+                        class={`group p-8 rounded-2xl border border-slate-200 bg-white ${colorBorder[item.color]} hover:bg-slate-50 transition-all duration-300 block shadow-sm`}
                     >
                         <div class="text-4xl mb-5 group-hover:scale-110 transition-transform inline-block">
                             {item.icon}
                         </div>
-                        <h2 class="text-xl font-bold text-white mb-3">
+                        <h2 class="text-xl font-bold text-slate-900 mb-3">
                             {item.title}
                         </h2>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6">
                             {item.description}
                         </p>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-slate-500">
                                 ⏱ {item.duration}
                             </span>
-                            <span class="text-indigo-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
+                            <span class="text-teal-600 font-medium group-hover:translate-x-1 transition-transform inline-block">
                                 Detail →
                             </span>
                         </div>

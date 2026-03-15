@@ -15,23 +15,23 @@ const formatDate = (date: Date) => {
 };
 ---
 
-<section id="artikel" class="py-24 bg-slate-950">
+<section id="artikel" class="py-24 bg-white">
     <div class="max-w-7xl mx-auto px-6">
         <!-- Section Header -->
         <div class="flex items-end justify-between mb-12">
             <div>
                 <p
-                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3"
+                    class="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-3"
                 >
                     Wawasan & Inspirasi
                 </p>
-                <h2 class="text-4xl md:text-5xl font-extrabold text-white">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900">
                     Artikel Terbaru
                 </h2>
             </div>
             <a
                 href="/artikel"
-                class="hidden md:inline-flex items-center gap-2 text-slate-400 hover:text-indigo-400 text-sm font-semibold transition-colors"
+                class="hidden md:inline-flex items-center gap-2 text-slate-500 hover:text-teal-600 text-sm font-semibold transition-colors"
             >
                 Lihat Semua
                 <svg
@@ -95,7 +95,7 @@ const formatDate = (date: Date) => {
                         <div class="flex gap-2">
                             {Array.from({ length: totalSlides }).map((_, i) => (
                                 <button
-                                    class={`artikel-dot h-2 rounded-full transition-all duration-300 ${i === 0 ? "w-8 bg-indigo-500" : "w-2 bg-white/20"}`}
+                                    class={`artikel-dot h-2 rounded-full transition-all duration-300 ${i === 0 ? "w-8 bg-teal-500" : "w-2 bg-slate-300"}`}
                                     data-index={i}
                                     aria-label={`Artikel ${i + 1}`}
                                 />
@@ -106,7 +106,7 @@ const formatDate = (date: Date) => {
                         <div class="flex gap-3">
                             <button
                                 id="artikel-prev"
-                                class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
+                                class="w-11 h-11 rounded-full border border-slate-200 bg-slate-50 hover:bg-teal-600 hover:border-teal-600 text-slate-700 hover:text-white flex items-center justify-center transition-all duration-200"
                                 aria-label="Artikel sebelumnya"
                             >
                                 <svg
@@ -126,7 +126,7 @@ const formatDate = (date: Date) => {
                             </button>
                             <button
                                 id="artikel-next"
-                                class="w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-indigo-600 hover:border-indigo-600 text-white flex items-center justify-center transition-all duration-200"
+                                class="w-11 h-11 rounded-full border border-slate-200 bg-slate-50 hover:bg-teal-600 hover:border-teal-600 text-slate-700 hover:text-white flex items-center justify-center transition-all duration-200"
                                 aria-label="Artikel selanjutnya"
                             >
                                 <svg
@@ -182,8 +182,8 @@ const formatDate = (date: Date) => {
                 const isActive = i === realIndex;
                 dot.classList.toggle("w-8", isActive);
                 dot.classList.toggle("w-2", !isActive);
-                dot.classList.toggle("bg-indigo-500", isActive);
-                dot.classList.toggle("bg-white/20", !isActive);
+                dot.classList.toggle("bg-teal-500", isActive);
+                dot.classList.toggle("bg-slate-300", !isActive);
             });
         }
 

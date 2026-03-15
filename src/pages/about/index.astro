@@ -7,7 +7,7 @@ const team = [
     role: "CEO & Co-founder",
     bio: "10+ tahun pengalaman di bidang konsultasi bisnis dan strategi perusahaan.",
     avatar: "AF",
-    color: "from-indigo-500 to-violet-600",
+    color: "from-teal-500 to-emerald-600",
   },
   {
     name: "Siti Rahayu",
@@ -21,7 +21,7 @@ const team = [
     role: "Head of Operations",
     bio: "Spesialis manajemen operasional dan pengembangan proses bisnis yang efisien.",
     avatar: "BS",
-    color: "from-sky-500 to-indigo-600",
+    color: "from-sky-500 to-teal-600",
   },
   {
     name: "Dewi Kusuma",
@@ -47,19 +47,19 @@ const milestones = [
 >
   <!-- Hero -->
   <section class="relative pt-32 pb-20 overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-indigo-950/20 to-slate-950 pointer-events-none"></div>
-    <div class="absolute top-20 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-slate-50 via-teal-50/20 to-slate-50 pointer-events-none"></div>
+    <div class="absolute top-20 right-0 w-96 h-96 bg-teal-400/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="relative max-w-7xl mx-auto px-6">
       <div class="max-w-3xl">
-        <p class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-4">Tentang Kami</p>
-        <h1 class="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+        <p class="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-4">Tentang Kami</p>
+        <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
           Kami Percaya Bisnis yang
-          <span class="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+          <span class="bg-gradient-to-r from-teal-500 to-emerald-500 bg-clip-text text-transparent">
             Baik Mengubah Dunia
           </span>
         </h1>
-        <p class="text-xl text-slate-300 leading-relaxed">
+        <p class="text-xl text-slate-600 leading-relaxed">
           Sejak 2016, Annafilah hadir sebagai partner pertumbuhan bisnis di Indonesia.
           Kami bukan sekadar vendor — kami adalah bagian dari tim Anda.
         </p>
@@ -70,18 +70,18 @@ const milestones = [
   <!-- Misi & Visi -->
   <section class="py-20 max-w-7xl mx-auto px-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="p-8 rounded-2xl border border-indigo-500/20 bg-indigo-500/5">
-        <div class="w-12 h-12 rounded-xl bg-indigo-600/20 flex items-center justify-center text-2xl mb-6">🎯</div>
-        <h2 class="text-2xl font-bold text-white mb-4">Misi</h2>
-        <p class="text-slate-300 leading-relaxed">
+      <div class="p-8 rounded-2xl border border-teal-200 bg-teal-50">
+        <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center text-2xl mb-6">🎯</div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">Misi</h2>
+        <p class="text-slate-600 leading-relaxed">
           Memberikan solusi bisnis yang terukur, inovatif, dan berdampak nyata bagi setiap klien —
           dari startup yang baru tumbuh hingga korporasi yang ingin bertransformasi.
         </p>
       </div>
-      <div class="p-8 rounded-2xl border border-violet-500/20 bg-violet-500/5">
-        <div class="w-12 h-12 rounded-xl bg-violet-600/20 flex items-center justify-center text-2xl mb-6">🔭</div>
-        <h2 class="text-2xl font-bold text-white mb-4">Visi</h2>
-        <p class="text-slate-300 leading-relaxed">
+      <div class="p-8 rounded-2xl border border-violet-200 bg-violet-50">
+        <div class="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center text-2xl mb-6">🔭</div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">Visi</h2>
+        <p class="text-slate-600 leading-relaxed">
           Menjadi perusahaan konsultasi dan teknologi #1 di Asia Tenggara yang dipercaya
           oleh ribuan bisnis untuk tumbuh berkelanjutan di era digital.
         </p>
@@ -90,11 +90,11 @@ const milestones = [
   </section>
 
   <!-- Timeline -->
-  <section class="py-20 bg-slate-900/50">
+  <section class="py-20 bg-slate-100">
     <div class="max-w-4xl mx-auto px-6">
       <div class="text-center mb-16">
-        <p class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3">Perjalanan Kami</p>
-        <h2 class="text-4xl font-extrabold text-white">Milestone</h2>
+        <p class="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-3">Perjalanan Kami</p>
+        <h2 class="text-4xl font-extrabold text-slate-900">Milestone</h2>
       </div>
       <div class="relative">
         <!-- Garis vertikal -->
@@ -104,13 +104,13 @@ const milestones = [
           {milestones.map((item, i) => (
             <div class={`relative flex items-start gap-8 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"}`}>
               <!-- Dot -->
-              <div class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-indigo-500 border-4 border-slate-950 -translate-x-1.5 mt-1"></div>
+              <div class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-teal-500 border-4 border-slate-50 -translate-x-1.5 mt-1"></div>
               <!-- Content -->
               <div class={`pl-16 md:pl-0 md:w-1/2 ${i % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"}`}>
-                <span class="inline-block px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-bold mb-3">
+                <span class="inline-block px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-sm font-bold mb-3">
                   {item.year}
                 </span>
-                <p class="text-slate-300 leading-relaxed">{item.event}</p>
+                <p class="text-slate-600 leading-relaxed">{item.event}</p>
               </div>
             </div>
           ))}
@@ -122,21 +122,21 @@ const milestones = [
   <!-- Tim -->
   <section class="py-24 max-w-7xl mx-auto px-6">
     <div class="text-center mb-16">
-      <p class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-3">Tim Kami</p>
-      <h2 class="text-4xl font-extrabold text-white">Orang-orang di Balik Annafilah</h2>
-      <p class="text-slate-400 mt-4 max-w-xl mx-auto">
+      <p class="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-3">Tim Kami</p>
+      <h2 class="text-4xl font-extrabold text-slate-900">Orang-orang di Balik Annafilah</h2>
+      <p class="text-slate-500 mt-4 max-w-xl mx-auto">
         Tim kami terdiri dari para profesional berpengalaman yang berdedikasi penuh untuk kesuksesan Anda.
       </p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {team.map((member) => (
-        <div class="group p-6 rounded-2xl border border-white/5 bg-white/2 hover:border-white/10 hover:bg-white/5 transition-all duration-300 text-center">
+        <div class="group p-6 rounded-2xl border border-slate-200 bg-white hover:border-teal-200 hover:bg-slate-50 transition-all duration-300 text-center shadow-sm">
           <div class={`w-20 h-20 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center text-white text-2xl font-extrabold mx-auto mb-5 group-hover:scale-105 transition-transform`}>
             {member.avatar}
           </div>
-          <h3 class="font-bold text-white text-lg">{member.name}</h3>
-          <p class="text-indigo-400 text-sm font-medium mt-1 mb-3">{member.role}</p>
-          <p class="text-slate-400 text-sm leading-relaxed">{member.bio}</p>
+          <h3 class="font-bold text-slate-900 text-lg">{member.name}</h3>
+          <p class="text-teal-600 text-sm font-medium mt-1 mb-3">{member.role}</p>
+          <p class="text-slate-500 text-sm leading-relaxed">{member.bio}</p>
         </div>
       ))}
     </div>

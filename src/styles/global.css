@@ -1,13 +1,47 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* ── Color Design Tokens ─────────────────────────────────────────
+   PRIMARY  = Light background palette  (white / slate-50 / slate-100)
+   SECONDARY = Teal accent (hijau tosca) menggantikan indigo
+   TEXT     = Dark text palette untuk kontras di atas background terang
+────────────────────────────────────────────────────────────────── */
+:root {
+    /* Primary – background terang */
+    --color-bg-base:       #f8fafc;   /* slate-50 */
+    --color-bg-surface:    #ffffff;   /* white */
+    --color-bg-muted:      #f1f5f9;   /* slate-100 */
+    --color-bg-subtle:     #e2e8f0;   /* slate-200 */
+
+    /* Secondary – teal / hijau tosca */
+    --color-teal-50:       #f0fdfa;
+    --color-teal-100:      #ccfbf1;
+    --color-teal-200:      #99f6e4;
+    --color-teal-300:      #5eead4;
+    --color-teal-400:      #2dd4bf;
+    --color-teal-500:      #14b8a6;   /* primary accent */
+    --color-teal-600:      #0d9488;   /* primary button */
+    --color-teal-700:      #0f766e;
+    --color-teal-800:      #115e59;
+    --color-teal-900:      #134e4a;
+
+    /* Text – dark palette untuk readability di atas bg terang */
+    --color-text-primary:  #0f172a;   /* slate-900 */
+    --color-text-secondary:#334155;   /* slate-700 */
+    --color-text-muted:    #64748b;   /* slate-500 */
+    --color-text-faint:    #94a3b8;   /* slate-400 */
+
+    /* Border */
+    --color-border:        #e2e8f0;   /* slate-200 */
+    --color-border-muted:  #cbd5e1;   /* slate-300 */
+}
+
 html {
     scroll-behavior: smooth;
 }
 
 body {
-    background-color: rgb(2 6 23);
-    /* slate-950 */
-    color: white;
+    background-color: var(--color-bg-base);
+    color: var(--color-text-primary);
     -webkit-font-smoothing: antialiased;
 }
