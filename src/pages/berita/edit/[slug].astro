@@ -27,32 +27,33 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
     title={`Edit Berita: ${newsItem.title} – Yayasan Annafilah`}
     description={`Form untuk mengedit berita "${newsItem.title}" di Yayasan Annafilah.`}
 >
-    <div class="min-h-screen bg-slate-950 pt-28 pb-20 px-6">
+    <div class="min-h-screen bg-slate-50 pt-28 pb-20 px-6">
         <div class="max-w-3xl mx-auto">
             <!-- Header -->
             <div class="mb-10">
                 <nav
                     class="text-sm text-slate-500 mb-6 flex items-center gap-2"
                 >
-                    <a href="/" class="hover:text-indigo-400 transition-colors"
+                    <a href="/" class="hover:text-teal-600 transition-colors"
                         >Beranda</a
                     >
                     <span>/</span>
                     <a
                         href="/berita"
-                        class="hover:text-indigo-400 transition-colors"
-                        >Berita</a
+                        class="hover:text-teal-600 transition-colors">Berita</a
                     >
                     <span>/</span>
                     <span class="text-slate-300">Edit Berita</span>
                 </nav>
                 <p
-                    class="text-indigo-400 font-semibold text-sm uppercase tracking-widest mb-2"
+                    class="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-2"
                 >
                     Manajemen Konten
                 </p>
-                <h1 class="text-4xl font-extrabold text-white">Edit Berita</h1>
-                <p class="text-slate-400 mt-2">
+                <h1 class="text-4xl font-extrabold text-slate-900">
+                    Edit Berita
+                </h1>
+                <p class="text-slate-500 mt-2">
                     Perbarui informasi berita di bawah ini.
                 </p>
             </div>
@@ -90,6 +91,26 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                         <span id="title-count">{newsItem.title.length}</span
                         >/100
                     </p>
+                </div>
+
+                <!-- Slug Preview -->
+                <div class="form-group">
+                    <label for="slug-preview" class="form-label">
+                        Slug URL
+                        <span class="text-slate-500 font-normal text-xs ml-2"
+                            >(otomatis dari judul)</span
+                        >
+                    </label>
+                    <div
+                        class="flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-sm"
+                    >
+                        <span class="text-slate-400 shrink-0">/berita/</span>
+                        <span
+                            id="slug-preview"
+                            class="text-teal-700 font-mono font-medium break-all"
+                            >{newsItem.slug}</span
+                        >
+                    </div>
                 </div>
 
                 <!-- Excerpt -->
@@ -215,7 +236,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
 
                     <div
                         id="gallery-container"
-                        class="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-slate-900/50 border border-white/5"
+                        class="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-slate-100 border border-slate-200"
                     >
                         {
                             newsItem.images.map((url, index) => (
@@ -251,7 +272,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                                         </button>
                                     </div>
                                     {index === 0 && (
-                                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-indigo-600 text-[10px] font-bold text-white uppercase tracking-wider">
+                                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-teal-600 text-[10px] font-bold text-white uppercase tracking-wider">
                                             Cover
                                         </div>
                                     )}
@@ -263,7 +284,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                         <button
                             type="button"
                             id="btn-add-gallery"
-                            class="aspect-video rounded-xl border-2 border-dashed border-white/10 hover:border-indigo-500/50 hover:bg-indigo-500/5 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-indigo-400 transition-all"
+                            class="aspect-video rounded-xl border-2 border-dashed border-slate-300 hover:border-teal-500/50 hover:bg-teal-50/20 flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-teal-600 transition-all"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -302,7 +323,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                     </label>
 
                     <div
-                        class="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-900/50 border border-white/5 mb-1"
+                        class="flex flex-wrap items-center gap-1.5 p-2 rounded-xl bg-slate-100 border border-slate-200 mb-1"
                     >
                         <button
                             type="button"
@@ -322,7 +343,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                             data-tag="em"
                             title="Italic">I</button
                         >
-                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <div class="w-px h-4 bg-slate-300 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn"
@@ -335,7 +356,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                             data-tag="h3"
                             title="Heading 3">H3</button
                         >
-                        <div class="w-px h-4 bg-white/10 mx-1"></div>
+                        <div class="w-px h-4 bg-slate-300 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn"
@@ -366,7 +387,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                     <button
                         type="submit"
                         id="btn-submit"
-                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50"
+                        class="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-teal-500/25 disabled:opacity-50"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -385,7 +406,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                     </button>
                     <a
                         href="/berita"
-                        class="px-6 py-3.5 rounded-xl border border-white/10 bg-slate-900 hover:bg-slate-800 text-slate-300 font-semibold text-base transition-colors"
+                        class="px-6 py-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 font-semibold text-base transition-colors"
                     >
                         Batal
                     </a>
@@ -401,18 +422,18 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
         @apply flex flex-col gap-2;
     }
     .form-label {
-        @apply text-sm font-semibold text-slate-200;
+        @apply text-sm font-semibold text-slate-700;
     }
     .form-input {
-        @apply w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white placeholder-slate-500
-               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all;
+        @apply w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400
+               focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all;
     }
     .form-hint {
         @apply text-xs text-slate-500;
     }
     .html-tag-btn {
-        @apply px-2.5 py-1 text-[10px] font-bold rounded bg-slate-800 text-slate-400 border border-white/5
-               hover:bg-indigo-600 hover:text-white hover:border-indigo-500 transition-all;
+        @apply px-2.5 py-1 text-[10px] font-bold rounded bg-slate-100 text-slate-600 border border-slate-200
+               hover:bg-teal-600 hover:text-white hover:border-teal-500 transition-all;
     }
 </style>
 
@@ -539,10 +560,29 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
         }
     });
 
+    // ── Slug auto-generate ──────────────────────────────────────────────────
+    function toSlug(str: string): string {
+        return str
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, " ") // hapus double spasi
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-"); // hapus double dash
+    }
+
+    const slugPreview = document.getElementById("slug-preview");
+    let currentSlug = slugPreview?.textContent ?? "";
+
     // ── Counters ──────────────────────────────────────────────────────────────
     titleInput?.addEventListener("input", () => {
         if (titleCount)
             titleCount.textContent = String(titleInput.value.length);
+        // Update slug preview
+        currentSlug = toSlug(titleInput.value);
+        if (slugPreview) slugPreview.textContent = currentSlug;
     });
     excerptEl?.addEventListener("input", () => {
         if (excerptCount)
@@ -573,6 +613,7 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
 
         const payload = new FormData();
         payload.append("title", title);
+        payload.append("slug", currentSlug || toSlug(title));
         payload.append("excerpt", (raw.get("excerpt") as string).trim());
         payload.append("category", (raw.get("category") as string).trim());
         payload.append("author", (raw.get("author") as string).trim());
