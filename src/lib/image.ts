@@ -27,6 +27,7 @@ export async function saveAsWebP(
     const outputPath = path.join(outputDir, `${filename}.webp`);
 
     await sharp(buffer)
+        .resize({ width: 1200, withoutEnlargement: true }) // Maksimal width 1200px (tidak memperbesar jika gambar aslinya sudah kecil)
         .webp({ quality })
         .toFile(outputPath);
 
