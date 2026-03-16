@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Hindari index halaman manajemen admin
+Disallow: /login
+Disallow: /berita/create
+Disallow: /berita/edit/
+Disallow: /artikel/create
+Disallow: /artikel/edit/
+Disallow: /program/create
+Disallow: /program/edit/
+
+Sitemap: https://annafilah.id/sitemap-index.xml
