@@ -2,11 +2,12 @@
 import Layout from "../../layouts/Layout.astro";
 import { getProgramBySlug } from "./-api/repository";
 import { getNewsByProgram } from "../berita/-api/repository";
+import type { ProgramResponse } from "./-api/types";
 
 export const prerender = false;
 
 const { slug } = Astro.params;
-const program = await getProgramBySlug(slug as string);
+const program: ProgramResponse | null = await getProgramBySlug(slug as string);
 
 if (!program) {
     return Astro.redirect("/program");
@@ -26,8 +27,8 @@ const formatDate = (date: Date) => {
 ---
 
 <Layout
-    title={`${program.name} – Yayasan Annafilah`}
-    description={`Detail program ${program.name} dari Yayasan Annafilah.`}
+    title={`${program.name} - Yayasan Annafilah`}
+    description={`${program.name} - ${program.description}.`}
     ogImage={program.image}
 >
     <!-- Hero -->

@@ -3,6 +3,17 @@ import Layout from "../../layouts/Layout.astro";
 
 // Middleware sudah memvalidasi login sebelum halaman ini dirender.
 const authorName = Astro.locals.username ?? "";
+const categories = [
+    "Bisnis",
+    "Teknologi",
+    "Pertanian",
+    "Peternakan",
+    "Keuangan",
+    "Manajemen",
+    "Inspirasi",
+    "Tips & Trik",
+    "Lainnya",
+];
 ---
 
 <Layout
@@ -102,18 +113,12 @@ const authorName = Astro.locals.username ?? "";
                             required
                             class="form-input"
                         >
-                            <option value="" disabled selected
-                                >Pilih kategori...</option
-                            >
-                            <option value="Bisnis">Bisnis</option>
-                            <option value="Teknologi">Teknologi</option>
-                            <option value="Pertanian">Pertanian</option>
-                            <option value="Peternakan">Peternakan</option>
-                            <option value="Keuangan">Keuangan</option>
-                            <option value="Manajemen">Manajemen</option>
-                            <option value="Inspirasi">Inspirasi</option>
-                            <option value="Tips & Trik">Tips & Trik</option>
-                            <option value="Lainnya">Lainnya</option>
+                            <option value="" disabled>Pilih kategori...</option>
+                            {
+                                categories.map((cat) => (
+                                    <option value={cat}>{cat}</option>
+                                ))
+                            }
                         </select>
                     </div>
                     <div class="form-group">

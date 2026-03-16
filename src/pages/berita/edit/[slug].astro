@@ -329,45 +329,63 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                             type="button"
                             class="html-tag-btn"
                             data-tag="p"
-                            title="Paragraph">P</button
+                            title="Paragraph (Alinea Baru)">P</button
                         >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="br"
+                            title="Line Break (Garis Baru)">BR</button
+                        >
+                        <div class="w-px h-4 bg-slate-300 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn font-bold"
                             data-tag="strong"
-                            title="Bold">B</button
+                            title="Bold (Tebal)">B</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn italic"
                             data-tag="em"
-                            title="Italic">I</button
+                            title="Italic (Miring)">I</button
                         >
-                        <div class="w-px h-4 bg-slate-300 mx-1"></div>
                         <button
                             type="button"
-                            class="html-tag-btn"
-                            data-tag="h2"
-                            title="Heading 2">H2</button
+                            class="html-tag-btn underline"
+                            data-tag="u"
+                            title="Underline (Garis Bawah)">U</button
                         >
+                        <div class="w-px h-4 bg-slate-300 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="h3"
-                            title="Heading 3">H3</button
+                            title="Heading 3 (Sub-judul)">H3</button
                         >
-                        <div class="w-px h-4 bg-slate-300 mx-1"></div>
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="ul"
-                            title="Unordered List">UL</button
+                            title="Unordered List (Daftar)">UL</button
                         >
                         <button
                             type="button"
                             class="html-tag-btn"
                             data-tag="li"
-                            title="List Item">LI</button
+                            title="List Item (Poin Daftar)">LI</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn text-lg leading-none"
+                            data-tag="blockquote"
+                            title="Quote (Kutipan)">“</button
+                        >
+                        <button
+                            type="button"
+                            class="html-tag-btn"
+                            data-tag="a"
+                            title="Link (Tautan)">Link</button
                         >
                     </div>
 
@@ -673,23 +691,53 @@ const categories = ["Event", "Pencapaian", "Kemitraan", "CSR", "Internal"];
                 : "mb-6 p-4 rounded-xl text-sm font-medium bg-red-500/10 border border-red-500/30 text-red-400 block";
     }
 
-    // ── Content Shortcuts ──
+    // ── Content Tag Shortcuts ────────────────────────────────────────────────
     const contentTextarea = document.getElementById(
         "content",
     ) as HTMLTextAreaElement;
-    document.querySelectorAll(".html-tag-btn").forEach((btn) => {
+    const tagButtons = document.querySelectorAll(".html-tag-btn");
+
+    tagButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
             const tag = (btn as HTMLElement).dataset.tag;
             if (!tag || !contentTextarea) return;
+
             const start = contentTextarea.selectionStart;
             const end = contentTextarea.selectionEnd;
             const text = contentTextarea.value;
             const selectedText = text.substring(start, end);
-            let insertion = `<${tag}>${selectedText}</${tag}>`;
-            if (tag === "br") insertion = "<br>\n";
+
+            let insertion = "";
+            let newCursorPos = start;
+
+            if (tag === "br") {
+                insertion = "<br>\n";
+                newCursorPos = start + insertion.length;
+            } else if (tag === "a") {
+                const url = prompt("Masukkan URL link:", "https://");
+                if (url === null) return; // Cancelled
+                insertion = `<a href="${url}" target="_blank" class="text-indigo-400 hover:underline"> ${selectedText || "link"} </a>`;
+                newCursorPos = start + insertion.length;
+            } else if (tag === "ul") {
+                insertion = `<ul>\n  <li>${selectedText || "Item 1"}</li>\n  <li>Item 2</li>\n</ul>`;
+                newCursorPos = start + insertion.length;
+            } else if (tag === "p") {
+                insertion = `<p>${selectedText}</p>\n`;
+                newCursorPos = start + insertion.length;
+            } else {
+                insertion = `<${tag}>${selectedText}</${tag}>`;
+                newCursorPos = start + tag.length + 2 + selectedText.length;
+            }
+
             contentTextarea.value =
                 text.substring(0, start) + insertion + text.substring(end);
+
+            // Focus back and set cursor
             contentTextarea.focus();
+            contentTextarea.setSelectionRange(newCursorPos, newCursorPos);
+
+            // Trigger input event to clear error class if any
+            contentTextarea.dispatchEvent(new Event("input"));
         });
     });
 </script>
