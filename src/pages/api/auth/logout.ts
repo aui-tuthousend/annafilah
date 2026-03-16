@@ -20,5 +20,5 @@ export const POST: APIRoute = async ({ cookies, redirect }) => {
     // Clear cookie di browser
     cookies.delete(SESSION_COOKIE, { path: "/" });
 
-    return redirect("/login");
+    return redirect("/");
 };
