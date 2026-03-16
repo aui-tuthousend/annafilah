@@ -65,16 +65,9 @@ export const PUT: APIRoute = async ({ params, request }) => {
             // 2. Cleanup unused physical files
             const imagesToRemove = newsData.images.filter(img => !existingImages.includes(img));
             if (imagesToRemove.length > 0) {
-                const fs = await import("node:fs/promises");
-                const path = await import("node:path");
+                const { deleteImage } = await import("../../../lib/image");
                 for (const imgUrl of imagesToRemove) {
-                    // Convert URL /uploads/... to local path public/uploads/...
-                    const filePath = path.join(process.cwd(), "public", imgUrl);
-                    try {
-                        await fs.unlink(filePath);
-                    } catch (e) {
-                        console.warn(`[Cleanup] Gagal menghapus file: ${filePath}`, e);
-                    }
+                    await deleteImage(imgUrl);
                 }
             }
 
@@ -83,8 +76,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
             if (newImageFiles.length > 0) {
                 const { saveAsWebP } = await import("../../../lib/image");
-                const path = await import("node:path");
-                const newsDir = path.join(process.cwd(), "public", "uploads", "news", finalSlug);
+                const newsDir = `uploads/news/${finalSlug}`;
 
                 for (let i = 0; i < newImageFiles.length; i++) {
                     const timestamp = Date.now();
@@ -124,25 +116,16 @@ export const DELETE: APIRoute = async ({ params }) => {
     try {
         const newsData = await getNewsById(id);
         if (newsData) {
-            const fs = await import("node:fs/promises");
-            const path = await import("node:path");
+            const { deleteImage } = await import("../../../lib/image");
 
             // Delete all images in gallery
             for (const imgUrl of newsData.images) {
-                const filePath = path.join(process.cwd(), "public", imgUrl);
-                try {
-                    await fs.unlink(filePath);
-                } catch (e) {
-                    console.warn(`[Delete] Gagal menghapus file gallery: ${filePath}`, e);
-                }
+                await deleteImage(imgUrl);
             }
 
             // Also check main image if not in gallery (though usually it is)
             if (newsData.image && !newsData.images.includes(newsData.image)) {
-                const filePath = path.join(process.cwd(), "public", newsData.image);
-                try {
-                    await fs.unlink(filePath);
-                } catch (e) { /* ignored */ }
+                await deleteImage(newsData.image);
             }
         }
 

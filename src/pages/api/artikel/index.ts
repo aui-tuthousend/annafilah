@@ -74,8 +74,8 @@ export const POST: APIRoute = async ({ request }) => {
             );
         }
 
-        // Save thumbnail as WebP → public/uploads/artikel/{slug}.webp
-        const uploadsDir = path.join(process.cwd(), "public", "uploads", "artikel");
+        // Save thumbnail as WebP directly to S3 → uploads/artikel/{slug}
+        const uploadsDir = "uploads/artikel";
         const imageUrl = await saveAsWebP(validImage, uploadsDir, slug);
 
         const data = await createArticle({

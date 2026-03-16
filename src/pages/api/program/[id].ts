@@ -48,21 +48,14 @@ export const PUT: APIRoute = async ({ params, request }) => {
 
                 // 2. Physical Cleanup
                 if (programData.image) {
-                    const fs = await import("node:fs/promises");
-                    const path = await import("node:path");
-                    const oldPath = path.join(process.cwd(), "public", programData.image);
-                    try {
-                        await fs.unlink(oldPath);
-                    } catch (e) {
-                        console.warn(`[Cleanup] Gagal menghapus file lama: ${oldPath}`, e);
-                    }
+                    const { deleteImage } = await import("../../../lib/image");
+                    await deleteImage(programData.image);
                 }
 
                 // 3. Save New Image
                 const finalSlug = body.slug || programData.slug;
                 const { saveAsWebP } = await import("../../../lib/image");
-                const path = await import("node:path");
-                const programDir = path.join(process.cwd(), "public", "uploads", "programs");
+                const programDir = "uploads/program";
                 body.image = await saveAsWebP(imageFile, programDir, finalSlug);
             }
         } else {
@@ -86,14 +79,8 @@ export const DELETE: APIRoute = async ({ params }) => {
     try {
         const programData = await getProgramById(id);
         if (programData?.image) {
-            const fs = await import("node:fs/promises");
-            const path = await import("node:path");
-            const filePath = path.join(process.cwd(), "public", programData.image);
-            try {
-                await fs.unlink(filePath);
-            } catch (e) {
-                console.warn(`[Delete] Gagal menghapus file: ${filePath}`, e);
-            }
+            const { deleteImage } = await import("../../../lib/image");
+            await deleteImage(programData.image);
         }
 
         const deleted = await deleteProgram(id);

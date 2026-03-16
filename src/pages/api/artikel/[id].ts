@@ -85,8 +85,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
                 const finalSlug = body.slug || (await getArticleById(id))?.slug;
                 if (finalSlug) {
                     const { saveAsWebP } = await import("../../../lib/image");
-                    const path = await import("node:path");
-                    const uploadsDir = path.join(process.cwd(), "public", "uploads", "artikel");
+                    const uploadsDir = "uploads/artikel";
                     body.image = await saveAsWebP(imageFile, uploadsDir, finalSlug);
                 }
             }
@@ -141,14 +140,8 @@ export const DELETE: APIRoute = async ({ params }) => {
     try {
         const articleData = await getArticleById(id);
         if (articleData?.image) {
-            const fs = await import("node:fs/promises");
-            const path = await import("node:path");
-            const filePath = path.join(process.cwd(), "public", articleData.image);
-            try {
-                await fs.unlink(filePath);
-            } catch (e) {
-                console.warn(`[Delete] Gagal menghapus file: ${filePath}`, e);
-            }
+            const { deleteImage } = await import("../../../lib/image");
+            await deleteImage(articleData.image);
         }
 
         const deleted = await deleteArticle(id);

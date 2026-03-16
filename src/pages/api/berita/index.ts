@@ -66,9 +66,9 @@ export const POST: APIRoute = async ({ request }) => {
             );
         }
 
-        // Save images as WebP → public/uploads/news/{slug}/
+        // Save images as WebP directly to S3 → uploads/news/{slug}
         // cover.webp = first image, image-2.webp, image-3.webp, ...
-        const newsDir = path.join(process.cwd(), "public", "uploads", "news", slug);
+        const newsDir = `uploads/news/${slug}`;
         const savedUrls: string[] = [];
 
         for (let i = 0; i < validImages.length; i++) {
