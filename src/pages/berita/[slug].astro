@@ -141,11 +141,11 @@ const formatDate = (date: Date) => {
                     <div class="mb-12">
                         <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent snap-x">
                             {news.images.map((img) => (
-                                <div class="relative flex-none w-full md:w-2/3 aspect-video rounded-2xl overflow-hidden snap-center bg-slate-900 border border-white/5">
+                                <div class="relative flex-none w-full md:w-2/3 rounded-2xl overflow-hidden snap-center bg-slate-900 border border-white/5">
                                     <img
                                         src={img}
                                         alt={news.title}
-                                        class="w-full h-full object-cover"
+                                        class="block h-auto w-full"
                                         loading="lazy"
                                     />
                                 </div>
