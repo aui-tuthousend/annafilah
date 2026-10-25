@@ -9,6 +9,7 @@ interface Props {
     slug: string;
     id: string;
     isLoggedIn?: boolean;
+    isFeatured?: boolean;
 }
 
 const {
@@ -20,6 +21,7 @@ const {
     slug,
     id,
     isLoggedIn = false,
+    isFeatured = false,
 } = Astro.props;
 ---
 
@@ -45,6 +47,27 @@ const {
             {
                 isLoggedIn && (
                     <div class="flex gap-2">
+                        <button
+                            type="button"
+                            data-id={id}
+                            data-featured={isFeatured ? "true" : "false"}
+                            aria-pressed={isFeatured ? "true" : "false"}
+                            title={
+                                isFeatured
+                                    ? "Hapus dari Hero"
+                                    : "Tampilkan di Hero"
+                            }
+                            class="hero-toggle p-1.5 rounded-full border backdrop-blur-sm transition-all"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                        </button>
                         <button
                             onclick={`event.preventDefault(); event.stopPropagation(); window.location.href='/berita/edit/${slug}'`}
                             class="p-1.5 rounded-full bg-white/80 text-slate-700 hover:text-teal-600 border border-slate-200 hover:border-teal-400/50 backdrop-blur-sm transition-all group/edit"
@@ -143,3 +166,28 @@ const {
         </div>
     </div>
 </a>
+
+<style>
+    /* Tombol toggle "tampilkan di hero" – aktif saat data-featured="true" */
+    .hero-toggle {
+        color: rgb(51 65 85);
+        background-color: rgb(255 255 255 / 0.8);
+        border-color: rgb(226 232 240);
+    }
+
+    .hero-toggle:hover {
+        color: rgb(217 119 6);
+        border-color: rgb(251 191 36 / 0.5);
+    }
+
+    .hero-toggle[data-featured="true"] {
+        color: rgb(255 255 255);
+        background-color: rgb(245 158 11);
+        border-color: rgb(245 158 11);
+    }
+
+    .hero-toggle[data-featured="true"]:hover {
+        background-color: rgb(217 119 6);
+        border-color: rgb(217 119 6);
+    }
+</style>

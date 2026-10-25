@@ -1,0 +1,93 @@
+---
+// Video Section – video profil/dokumentasi yayasan dari R2 storage.
+// Ganti videoUrl & poster sesuai nama file yang di-upload ke bucket R2.
+const videoUrl = "https://s3.annafilah.id/video/compressed.mp4";
+const poster = "https://s3.annafilah.id/video/cover.jpg";
+---
+
+<section class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-6">
+        <!-- Section Header -->
+        <div class="text-center mb-12">
+            <!-- <p
+                class="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-3"
+            >
+                Dokumentasi
+            </p> -->
+            <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900">
+                Kenali Kami Lebih Dekat
+            </h2>
+            <p class="text-slate-500 text-lg leading-relaxed mt-4 max-w-2xl mx-auto">
+                Video profil Yayasan Annafilah.
+            </p>
+        </div>
+
+        <!-- Video Player -->
+        <div
+            class="relative group max-w-4xl mx-auto rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-slate-900"
+        >
+            <video
+                id="profil-video"
+                class="w-full aspect-video object-cover"
+                poster={poster}
+                preload="none"
+                playsinline
+            >
+                <source src={videoUrl} type="video/mp4" />
+            </video>
+
+            <!-- Play Overlay -->
+            <button
+                id="profil-video-play"
+                type="button"
+                aria-label="Putar video profil Annafilah"
+                class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-slate-900/40 hover:bg-slate-900/30 transition-colors duration-300 cursor-pointer"
+            >
+                <span
+                    class="w-20 h-20 rounded-full bg-teal-600 hover:bg-teal-500 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-9 h-9 text-white ml-1"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path d="M8 5v14l11-7z"></path>
+                    </svg>
+                </span>
+                <span
+                    class="text-white text-sm font-semibold tracking-wide uppercase"
+                >
+                    Putar Video
+                </span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+    function setupProfilVideo() {
+        const video = document.getElementById(
+            "profil-video",
+        ) as HTMLVideoElement | null;
+        const playBtn = document.getElementById("profil-video-play");
+
+        if (!video || !playBtn) return;
+        if (video.dataset.initialized === "true") return;
+        video.dataset.initialized = "true";
+
+        playBtn.addEventListener("click", () => {
+            playBtn.style.display = "none";
+            video.controls = true;
+            video.play();
+        });
+
+        video.addEventListener("ended", () => {
+            video.controls = false;
+            playBtn.style.display = "flex";
+        });
+    }
+
+    setupProfilVideo();
+    document.addEventListener("astro:after-swap", setupProfilVideo);
+</script>

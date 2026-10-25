@@ -15,6 +15,7 @@ export interface CreateNewsDto {
     image: string;
     programId?: string | null;   // optional association to a program
     isPublished?: boolean;
+    isFeatured?: boolean;        // tampilkan sebagai slide di hero section
 }
 
 /** Payload when updating news */
@@ -38,6 +39,7 @@ export interface NewsResponse {
     images: string[];
     programId: string | null;
     isPublished: boolean;
+    isFeatured: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -53,6 +55,7 @@ export interface NewsPreview {
     location: string;
     image: string;
     programId: string | null;
+    isFeatured: boolean;
     createdAt: Date;
 }
 

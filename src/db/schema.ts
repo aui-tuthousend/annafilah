@@ -63,6 +63,8 @@ export const news = pgTable("news", {
     programId: uuid("program_id")
         .references(() => programs.id, { onDelete: "set null" }),
     isPublished: boolean("is_published").default(true).notNull(),
+    // Ditampilkan sebagai slide di hero section halaman home
+    isFeatured: boolean("is_featured").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
         .defaultNow()
         .notNull(),

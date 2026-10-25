@@ -30,6 +30,7 @@ function toResponse(
         images: images,
         programId: row.programId ?? null,
         isPublished: row.isPublished,
+        isFeatured: row.isFeatured,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
     };
@@ -46,8 +47,21 @@ function toPreview(row: typeof news.$inferSelect): NewsPreview {
         location: row.location,
         image: row.image,
         programId: row.programId ?? null,
+        isFeatured: row.isFeatured,
         createdAt: row.createdAt,
     };
+}
+
+// ─── READ: Get news featured on the home hero section ─────────────────────────
+export async function getFeaturedNews(limit = 3): Promise<NewsPreview[]> {
+    const rows = await db
+        .select()
+        .from(news)
+        .where(and(eq(news.isFeatured, true), eq(news.isPublished, true)))
+        .orderBy(desc(news.createdAt))
+        .limit(limit);
+
+    return rows.map(toPreview);
 }
 
 // ─── READ: Get all news (with optional filters) ───────────────────────────────
@@ -170,6 +184,7 @@ export async function createNews(
             image: dto.image,
             programId: dto.programId ?? null,
             isPublished: dto.isPublished ?? true,
+            isFeatured: dto.isFeatured ?? false,
         })
         .returning();
 
@@ -195,6 +210,7 @@ export async function updateNews(
     if (dto.image !== undefined) updateData.image = dto.image;
     if ("programId" in dto) updateData.programId = dto.programId ?? null;
     if (dto.isPublished !== undefined) updateData.isPublished = dto.isPublished;
+    if (dto.isFeatured !== undefined) updateData.isFeatured = dto.isFeatured;
 
     const [row] = await db
         .update(news)

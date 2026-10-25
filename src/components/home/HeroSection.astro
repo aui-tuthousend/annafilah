@@ -1,10 +1,43 @@
 ---
-// Hero Section – image slider with infinite loop + stats bar
-const images = [
+// Hero Section – slider berita berfeature + gambar statis, loop tak terbatas
+import { getFeaturedNews } from "../../pages/berita/-api/repository";
+
+// Gambar statis yang selalu tampil di akhir slider (tanpa tautan)
+const staticImages = [
     "https://s3.annafilah.id/hero/hero1.webp",
     "https://s3.annafilah.id/hero/hero2.webp",
     "https://s3.annafilah.id/hero/hero3.webp",
-    "https://s3.annafilah.id/hero/hero1.webp",
+];
+
+// Berita terbaru yang di-toggle dari halaman /berita (maksimal 3)
+const featuredNews = await getFeaturedNews(3);
+
+interface Slide {
+    image: string;
+    alt: string;
+    title?: string;
+    category?: string;
+    slug?: string;
+}
+
+const slides: Slide[] = [
+    ...featuredNews.map((item) => ({
+        image: item.image,
+        alt: item.title,
+        title: item.title,
+        category: item.category,
+        slug: item.slug,
+    })),
+    ...staticImages.map((src) => ({
+        image: src,
+        alt: "Annafilah Hero Showcase",
+    })),
+];
+
+// Salinan slide pertama di akhir untuk menyambung loop tanpa terlihat
+const allSlides = [
+    ...slides.map((slide) => ({ ...slide, isClone: false })),
+    { ...slides[0], isClone: true },
 ];
 ---
 
@@ -19,17 +52,42 @@ const images = [
             style="transform: translateX(0%);"
         >
             {
-                images.map((img, index) => (
+                allSlides.map((slide, index) => (
                     <div
-                        class={`min-w-full relative aspect-[2.5/1] bg-slate-200 overflow-hidden ${index === 3 ? "hero-clone" : ""}`}
+                        class={`hero-slide min-w-full relative aspect-[2.5/1] bg-slate-200 overflow-hidden ${slide.isClone ? "hero-clone" : ""}`}
                     >
-                        <img
-                            src={img}
-                            alt="Annafilah Hero Showcase"
-                            class="w-full h-full object-cover select-none"
-                            loading={index === 0 ? "eager" : "lazy"}
-                        />
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-100/30 via-transparent to-transparent" />
+                        {slide.slug ? (
+                            <a
+                                href={`/berita/${slide.slug}`}
+                                class="group block w-full h-full"
+                            >
+                                <img
+                                    src={slide.image}
+                                    alt={slide.alt}
+                                    class="w-full h-full object-cover select-none"
+                                    loading={index === 0 ? "eager" : "lazy"}
+                                />
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/75 via-slate-900/15 to-transparent" />
+                                <div class="absolute inset-x-0 bottom-0 p-5 md:p-10 flex flex-col items-start gap-3">
+                                    <span class="px-3 py-1 rounded-full bg-teal-600 text-white text-xs font-semibold uppercase tracking-wider">
+                                        {slide.category}
+                                    </span>
+                                    <h3 class="text-white text-xl md:text-3xl font-bold leading-tight max-w-3xl group-hover:text-teal-200 transition-colors">
+                                        {slide.title}
+                                    </h3>
+                                </div>
+                            </a>
+                        ) : (
+                            <>
+                                <img
+                                    src={slide.image}
+                                    alt={slide.alt}
+                                    class="w-full h-full object-cover select-none"
+                                    loading={index === 0 ? "eager" : "lazy"}
+                                />
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-100/30 via-transparent to-transparent" />
+                            </>
+                        )}
                     </div>
                 ))
             }
@@ -39,27 +97,39 @@ const images = [
 
 <script>
     function setupHeroCarousel() {
+        const carousel = document.getElementById(
+            "hero-carousel",
+        ) as HTMLElement | null;
+
+        if (!carousel) return;
+        if (carousel.dataset.initialized === "true") return;
+        carousel.dataset.initialized = "true";
+
+        const track: HTMLElement = carousel;
+
+        // Slide asli saja (clone di akhir tidak dihitung)
+        const totalSlides = track.querySelectorAll(
+            ".hero-slide:not(.hero-clone)",
+        ).length;
+        if (totalSlides < 2) return;
+
         let currentSlide: number = 0;
-        const carousel = document.getElementById("hero-carousel");
-        const totalSlides = 3; // Actual unique slides (excluding clone)
-        let interval: any;
+        let interval: ReturnType<typeof setInterval> | undefined;
 
         function updateSlide(index: number, animate: boolean = true) {
             currentSlide = index;
-            if (carousel) {
-                carousel.style.transition = animate
-                    ? "transform 1000ms ease-in-out"
-                    : "none";
-                carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+            track.style.transition = animate
+                ? "transform 1000ms ease-in-out"
+                : "none";
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
 
-                // After sliding to the clone, silently jump back to slide 0
-                if (currentSlide === totalSlides) {
-                    setTimeout(() => {
-                        currentSlide = 0;
-                        carousel.style.transition = "none";
-                        carousel.style.transform = `translateX(0%)`;
-                    }, 1000);
-                }
+            // Setelah sampai clone, lompat diam-diam ke slide pertama
+            if (currentSlide === totalSlides) {
+                setTimeout(() => {
+                    currentSlide = 0;
+                    track.style.transition = "none";
+                    track.style.transform = `translateX(0%)`;
+                }, 1000);
             }
         }
 
@@ -68,10 +138,8 @@ const images = [
             interval = setInterval(() => updateSlide(currentSlide + 1), 5000);
         }
 
-        if (carousel) {
-            updateSlide(0, false);
-            startInterval();
-        }
+        updateSlide(0, false);
+        startInterval();
     }
 
     setupHeroCarousel();

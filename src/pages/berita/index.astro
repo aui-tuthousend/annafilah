@@ -125,6 +125,7 @@ const formatDate = (date: Date) => {
                                 slug={item.slug}
                                 id={item.id}
                                 isLoggedIn={isLoggedIn}
+                                isFeatured={item.isFeatured}
                             />
                         </div>
                     ))
@@ -203,4 +204,51 @@ const formatDate = (date: Date) => {
 
     setupFilter();
     document.addEventListener("astro:after-swap", setupFilter);
+
+    // Toggle "tampilkan di hero section" dari daftar berita (khusus admin)
+    function setupHeroToggle() {
+        const buttons =
+            document.querySelectorAll<HTMLButtonElement>(".hero-toggle");
+
+        buttons.forEach((btn) => {
+            if (btn.dataset.bound === "true") return;
+            btn.dataset.bound = "true";
+
+            btn.addEventListener("click", async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const id = btn.dataset.id;
+                if (!id) return;
+
+                const next = btn.dataset.featured !== "true";
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch(`/api/berita/${id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ isFeatured: next }),
+                    });
+                    const json = await res.json();
+
+                    if (!res.ok || !json.success) {
+                        alert(json.error ?? "Gagal memperbarui status hero.");
+                        return;
+                    }
+
+                    btn.dataset.featured = String(next);
+                    btn.setAttribute("aria-pressed", String(next));
+                    btn.title = next ? "Hapus dari Hero" : "Tampilkan di Hero";
+                } catch {
+                    alert("Gagal memperbarui status hero.");
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        });
+    }
+
+    setupHeroToggle();
+    document.addEventListener("astro:after-swap", setupHeroToggle);
 </script>
