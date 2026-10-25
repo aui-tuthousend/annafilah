@@ -1,4 +1,4 @@
-// src/pages/artikel/-api/types.ts
+// src/pages/artikel/_api/types.ts
 // ─── DTO & Interfaces for Artikel feature ──────────────────────────────────────
 
 // ─── Request DTOs ─────────────────────────────────────────────────────────────

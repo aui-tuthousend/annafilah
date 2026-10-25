@@ -1,4 +1,4 @@
-// src/pages/berita/-api/repository.ts
+// src/pages/berita/_api/repository.ts
 // ─── News CRUD logic via Drizzle ORM ─────────────────────────────────────────
 
 import { eq, desc, and, ilike } from "drizzle-orm";

@@ -1,0 +1,35 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+// Pastikan selalu dibalas dengan status 404
+Astro.response.status = 404;
+---
+
+<Layout title="Halaman tidak ditemukan - Yayasan Annafilah" noindex>
+    <section class="min-h-[60vh] flex items-center justify-center px-6 py-32">
+        <div class="text-center max-w-lg">
+            <p class="text-6xl font-black text-teal-600 mb-4">404</p>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4">
+                Halaman tidak ditemukan
+            </h1>
+            <p class="text-slate-500 leading-relaxed mb-8">
+                Halaman yang Anda cari mungkin sudah dipindahkan atau tidak
+                pernah ada.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a
+                    href="/"
+                    class="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-bold transition-colors"
+                >
+                    Kembali ke Beranda
+                </a>
+                <a
+                    href="/berita"
+                    class="px-5 py-2.5 rounded-xl border border-slate-200 hover:border-teal-400/50 text-slate-600 hover:text-teal-600 text-sm font-bold transition-colors"
+                >
+                    Lihat Berita
+                </a>
+            </div>
+        </div>
+    </section>
+</Layout>

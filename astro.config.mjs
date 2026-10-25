@@ -1,7 +1,6 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import node from "@astrojs/node";
-import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,7 +12,6 @@ export default defineConfig({
   security: {
     checkOrigin: false,
   },
-  integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],
   },

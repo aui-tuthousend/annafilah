@@ -1,5 +1,5 @@
 ---
-import { getAllArticles } from "../../artikel/-api/repository";
+import { getAllArticles } from "../../artikel/_api/repository";
 import ArtikelCard from "./ArtikelCard.astro";
 
 const articles = await getAllArticles({ isPublished: true, limit: 5 });

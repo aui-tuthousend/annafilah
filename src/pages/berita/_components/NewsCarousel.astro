@@ -1,5 +1,5 @@
 ---
-import { getAllNews } from "../-api/repository";
+import { getAllNews } from "../_api/repository";
 import NewsCard from "./NewsCard.astro";
 
 const newsItems = await getAllNews({ isPublished: true, limit: 6 });

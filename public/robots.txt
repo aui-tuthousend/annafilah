@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# Hindari index halaman manajemen admin
+# Hindari crawl halaman manajemen admin
 Disallow: /login
 Disallow: /berita/create
 Disallow: /berita/edit/
@@ -9,5 +9,6 @@ Disallow: /artikel/create
 Disallow: /artikel/edit/
 Disallow: /program/create
 Disallow: /program/edit/
+Disallow: /api/
 
-Sitemap: https://annafilah.id/sitemap-index.xml
+Sitemap: https://annafilah.id/sitemap.xml

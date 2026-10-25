@@ -2,8 +2,8 @@
 // ─── GET /api/program  → list all programs
 // ─── POST /api/program → create new program (multipart/form-data)
 import type { APIRoute } from "astro";
-import { getAllPrograms, createProgram } from "../../program/-api/repository";
-import type { ListProgramQuery } from "../../program/-api/types";
+import { getAllPrograms, createProgram } from "../../program/_api/repository";
+import type { ListProgramQuery } from "../../program/_api/types";
 import { saveAsWebP } from "../../../lib/image";
 import path from "node:path";
 

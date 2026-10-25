@@ -1,4 +1,4 @@
-// src/pages/artikel/-api/repository.ts
+// src/pages/artikel/_api/repository.ts
 // ─── Article CRUD logic via Drizzle ORM ──────────────────────────────────────
 
 import { eq, desc, and, ilike } from "drizzle-orm";

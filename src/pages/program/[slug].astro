@@ -1,8 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getProgramBySlug } from "./-api/repository";
-import { getNewsByProgram } from "../berita/-api/repository";
-import type { ProgramResponse } from "./-api/types";
+import { getProgramBySlug } from "./_api/repository";
+import { getNewsByProgram } from "../berita/_api/repository";
+import type { ProgramResponse } from "./_api/types";
 
 export const prerender = false;
 
@@ -10,7 +10,9 @@ const { slug } = Astro.params;
 const program: ProgramResponse | null = await getProgramBySlug(slug as string);
 
 if (!program) {
-    return Astro.redirect("/program");
+    // Konten tidak ditemukan → balas 404 asli (bukan redirect)
+    Astro.response.status = 404;
+    return Astro.rewrite("/404");
 }
 
 // Berita terkait: ambil dari database berdasarkan programId

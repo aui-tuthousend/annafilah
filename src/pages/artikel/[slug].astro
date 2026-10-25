@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getArticleBySlug, getAllArticles } from "./-api/repository";
+import { getArticleBySlug, getAllArticles } from "./_api/repository";
 
 export const prerender = false;
 
@@ -9,7 +9,9 @@ const { slug } = Astro.params;
 const artikel = await getArticleBySlug(slug as string);
 
 if (!artikel) {
-    return Astro.redirect("/artikel");
+    // Konten tidak ditemukan → balas 404 asli (bukan redirect)
+    Astro.response.status = 404;
+    return Astro.rewrite("/404");
 }
 
 // Artikel terkait: kategori sama, bukan artikel ini sendiri (ambil dari DB)
@@ -26,12 +28,70 @@ const formatDate = (date: Date) => {
         year: "numeric",
     }).format(date);
 };
+
+const siteOrigin = (Astro.site ?? Astro.url.origin).toString();
+const pageUrl = new URL(`/artikel/${artikel.slug}`, Astro.site ?? Astro.url.origin);
+
+// Structured data: artikel + breadcrumb
+const structuredData = [
+    {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: artikel.title,
+        description: artikel.excerpt,
+        image: [artikel.image],
+        datePublished: artikel.createdAt.toISOString(),
+        dateModified: artikel.updatedAt.toISOString(),
+        author: { "@type": "Person", name: artikel.author },
+        keywords: artikel.tags.join(", "),
+        publisher: {
+            "@type": "Organization",
+            name: "Yayasan Annafilah",
+            logo: {
+                "@type": "ImageObject",
+                url: new URL("/logo.webp", Astro.site ?? Astro.url.origin)
+                    .toString(),
+            },
+        },
+        mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl.toString() },
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+            {
+                "@type": "ListItem",
+                position: 1,
+                name: "Beranda",
+                item: siteOrigin,
+            },
+            {
+                "@type": "ListItem",
+                position: 2,
+                name: "Artikel",
+                item: new URL("/artikel", Astro.site ?? Astro.url.origin)
+                    .toString(),
+            },
+            {
+                "@type": "ListItem",
+                position: 3,
+                name: artikel.title,
+                item: pageUrl.toString(),
+            },
+        ],
+    },
+];
 ---
 
 <Layout
     title={`${artikel.title} - Yayasan Annafilah`}
     description={`${artikel.title} - ${artikel.excerpt} - Yayasan Annafilah`}
     ogImage={artikel.image}
+    ogType="article"
+    publishedTime={artikel.createdAt}
+    modifiedTime={artikel.updatedAt}
+    author={artikel.author}
+    structuredData={structuredData}
 >
     <!-- Hero Image -->
     <div

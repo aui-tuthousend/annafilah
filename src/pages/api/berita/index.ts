@@ -2,8 +2,8 @@
 // ─── GET /api/berita  → list all news
 // ─── POST /api/berita → create new news (multipart/form-data, multiple images)
 import type { APIRoute } from "astro";
-import { getAllNews, createNews, addNewsImages } from "../../berita/-api/repository";
-import type { ListNewsQuery } from "../../berita/-api/types";
+import { getAllNews, createNews, addNewsImages } from "../../berita/_api/repository";
+import type { ListNewsQuery } from "../../berita/_api/types";
 import { saveAsWebP } from "../../../lib/image";
 import path from "node:path";
 

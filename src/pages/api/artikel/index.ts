@@ -2,8 +2,8 @@
 // ─── GET /api/artikel  → list all articles
 // ─── POST /api/artikel → create new article (multipart/form-data)
 import type { APIRoute } from "astro";
-import { getAllArticles, createArticle } from "../../artikel/-api/repository";
-import type { ListArticleQuery } from "../../artikel/-api/types";
+import { getAllArticles, createArticle } from "../../artikel/_api/repository";
+import type { ListArticleQuery } from "../../artikel/_api/types";
 import { saveAsWebP } from "../../../lib/image";
 import path from "node:path";
 

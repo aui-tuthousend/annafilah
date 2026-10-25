@@ -1,7 +1,7 @@
 // src/pages/api/program/[id].ts
 import type { APIRoute } from "astro";
-import { getProgramById, updateProgram, deleteProgram } from "../../program/-api/repository";
-import type { UpdateProgramDto } from "../../program/-api/types";
+import { getProgramById, updateProgram, deleteProgram } from "../../program/_api/repository";
+import type { UpdateProgramDto } from "../../program/_api/types";
 
 export const prerender = false;
 

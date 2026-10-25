@@ -1,4 +1,4 @@
-// src/pages/berita/-api/types.ts
+// src/pages/berita/_api/types.ts
 // ─── DTO & Interfaces for Berita (News) feature ──────────────────────────────
 
 // ─── Request DTOs ─────────────────────────────────────────────────────────────

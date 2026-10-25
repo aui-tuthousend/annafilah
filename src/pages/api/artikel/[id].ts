@@ -8,8 +8,8 @@ import {
     updateArticle,
     deleteArticle,
     togglePublish,
-} from "../../artikel/-api/repository";
-import type { UpdateArticleDto } from "../../artikel/-api/types";
+} from "../../artikel/_api/repository";
+import type { UpdateArticleDto } from "../../artikel/_api/types";
 
 export const prerender = false;
 

@@ -1,7 +1,7 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
-import { getNewsBySlugAdmin } from "../-api/repository";
-import { getAllPrograms } from "../../program/-api/repository";
+import { getNewsBySlugAdmin } from "../_api/repository";
+import { getAllPrograms } from "../../program/_api/repository";
 
 export const prerender = false;
 
@@ -33,6 +33,7 @@ const categories = [
 <Layout
     title={`Edit Berita: ${newsItem.title} – Yayasan Annafilah`}
     description={`Form untuk mengedit berita "${newsItem.title}" di Yayasan Annafilah.`}
+    noindex
 >
     <div class="min-h-screen bg-slate-50 pt-28 pb-20 px-6">
         <div class="max-w-3xl mx-auto">

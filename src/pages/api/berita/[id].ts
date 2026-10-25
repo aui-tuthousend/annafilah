@@ -1,7 +1,7 @@
 // src/pages/api/berita/[id].ts
 import type { APIRoute } from "astro";
-import { getNewsById, updateNews, deleteNews } from "../../berita/-api/repository";
-import type { UpdateNewsDto } from "../../berita/-api/types";
+import { getNewsById, updateNews, deleteNews } from "../../berita/_api/repository";
+import type { UpdateNewsDto } from "../../berita/_api/types";
 
 export const prerender = false;
 
@@ -92,7 +92,7 @@ export const PUT: APIRoute = async ({ params, request }) => {
             }
 
             // Sync images in DB
-            const { syncNewsImages } = await import("../../berita/-api/repository");
+            const { syncNewsImages } = await import("../../berita/_api/repository");
             await syncNewsImages(id, finalImages);
 
         } else {
