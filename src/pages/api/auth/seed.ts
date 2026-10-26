@@ -13,17 +13,21 @@ import { db } from "../../../db";
 import { users } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { envValue } from "../../../lib/runtime-env";
 
 export const prerender = false;
 
-// Ganti secret ini jika ingin lebih aman
-const SEED_SECRET = import.meta.env.SESSION_SECRET ?? "annafilah-session-secret-2024-ganti-ini";
+// Ganti secret ini jika ingin lebih aman (dibaca dari runtime env, bukan build-time)
+function getSeedSecret(): string {
+    return envValue("SESSION_SECRET", import.meta.env.SESSION_SECRET)
+        ?? "annafilah-session-secret-2024-ganti-ini";
+}
 
 export const POST: APIRoute = async ({ request }) => {
     try {
         const body = await request.json().catch(() => null);
 
-        if (!body || body.secret !== SEED_SECRET) {
+        if (!body || body.secret !== getSeedSecret()) {
             return new Response(
                 JSON.stringify({ success: false, error: "Secret tidak valid." }),
                 { status: 403, headers: { "Content-Type": "application/json" } }

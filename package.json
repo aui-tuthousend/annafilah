@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
-    "@astrojs/node": "^9.5.4",
+    "@astrojs/cloudflare": "^12",
     "@astrojs/sitemap": "^3.7.1",
     "@aws-sdk/client-s3": "^3.1009.0",
     "@tailwindcss/vite": "^4.2.0",
@@ -22,13 +22,12 @@
     "daisyui": "^5.5.19",
     "drizzle-orm": "^0.45.1",
     "postgres": "^3.4.8",
-    "sharp": "^0.34.5",
     "tailwindcss": "^4.2.0",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
-    "@types/sharp": "^0.32.0",
-    "drizzle-kit": "^0.31.9"
+    "drizzle-kit": "^0.31.9",
+    "wrangler": "^4.152.0"
   }
 }

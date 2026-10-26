@@ -75,13 +75,13 @@ export const PUT: APIRoute = async ({ params, request }) => {
             const finalImages = [...existingImages];
 
             if (newImageFiles.length > 0) {
-                const { saveAsWebP } = await import("../../../lib/image");
+                const { saveImage } = await import("../../../lib/image");
                 const newsDir = `uploads/news/${finalSlug}`;
 
                 for (let i = 0; i < newImageFiles.length; i++) {
                     const timestamp = Date.now();
                     const filename = `img-${timestamp}-${i}`;
-                    const url = await saveAsWebP(newImageFiles[i], newsDir, filename);
+                    const url = await saveImage(newImageFiles[i], newsDir, filename);
                     finalImages.push(url);
                 }
             }

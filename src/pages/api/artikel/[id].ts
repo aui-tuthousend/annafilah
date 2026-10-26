@@ -84,9 +84,9 @@ export const PUT: APIRoute = async ({ params, request }) => {
             if (imageFile && imageFile.size > 0 && imageFile.type.startsWith("image/")) {
                 const finalSlug = body.slug || (await getArticleById(id))?.slug;
                 if (finalSlug) {
-                    const { saveAsWebP } = await import("../../../lib/image");
+                    const { saveImage } = await import("../../../lib/image");
                     const uploadsDir = "uploads/artikel";
-                    body.image = await saveAsWebP(imageFile, uploadsDir, finalSlug);
+                    body.image = await saveImage(imageFile, uploadsDir, finalSlug);
                 }
             }
         } else {

@@ -454,6 +454,8 @@ const categories = [
 </style>
 
 <script>
+    import { convertToWebP } from "../../../lib/client-webp";
+
     const form = document.getElementById(
         "edit-artikel-form",
     ) as HTMLFormElement;
@@ -601,7 +603,8 @@ const categories = [
         payload.append("tags", JSON.stringify(tags));
 
         if (selectedFile) {
-            payload.append("image", selectedFile);
+            // Konversi ke WebP di browser (Workers tidak punya sharp)
+            payload.append("image", await convertToWebP(selectedFile));
         }
 
         try {

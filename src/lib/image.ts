@@ -1,97 +1,89 @@
 // src/lib/image.ts
-// ─── Shared image processing utility ──────────────────────────────────────────
-// Converts any uploaded image to WebP and saves to the public/uploads directory.
+// ─── Simpan & hapus gambar di Cloudflare R2 (S3-compatible) ───────────────────
+// Resize + konversi WebP dilakukan di browser (lihat src/lib/client-webp.ts)
+// sebelum file dikirim ke API, karena Cloudflare Workers tidak bisa memakai
+// native module seperti sharp.
 
-import sharp from "sharp";
-import fs from "node:fs/promises";
-import path from "node:path";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { envValue } from "./runtime-env";
 
-const s3Client = new S3Client({
-    region: import.meta.env.S3_REGION || process.env.S3_REGION || "auto",
-    endpoint: import.meta.env.S3_ENDPOINT || process.env.S3_ENDPOINT,
-    credentials: {
-        accessKeyId: import.meta.env.S3_ACCESS_KEY || process.env.S3_ACCESS_KEY || "",
-        secretAccessKey: import.meta.env.S3_SECRET_KEY || process.env.S3_SECRET_KEY || "",
-    },
-});
+const EXTENSION_BY_TYPE: Record<string, string> = {
+    "image/webp": "webp",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/gif": "gif",
+    "image/avif": "avif",
+};
+
+let s3Client: S3Client | undefined;
+
+function getS3Client(): S3Client {
+    if (!s3Client) {
+        s3Client = new S3Client({
+            region: envValue("S3_REGION", import.meta.env.S3_REGION) || "auto",
+            endpoint: envValue("S3_ENDPOINT", import.meta.env.S3_ENDPOINT),
+            credentials: {
+                accessKeyId: envValue("S3_ACCESS_KEY", import.meta.env.S3_ACCESS_KEY) ?? "",
+                secretAccessKey: envValue("S3_SECRET_KEY", import.meta.env.S3_SECRET_KEY) ?? "",
+            },
+        });
+    }
+    return s3Client;
+}
+
+function getBucketName(): string {
+    return envValue("S3_BUCKET_NAME", import.meta.env.S3_BUCKET_NAME) ?? "";
+}
+
+function getPublicUrl(): string {
+    return (envValue("S3_PUBLIC_URL", import.meta.env.S3_PUBLIC_URL) ?? "").replace(/\/$/, "");
+}
 
 /**
- * Convert an uploaded File to WebP and save to S3.
+ * Simpan gambar ke R2 dan kembalikan public URL-nya.
  *
- * @param file       - File object from FormData
- * @param directory  - S3 prefix directory without leading/trailing clash (e.g. "uploads/program")
- * @param filename   - Filename WITHOUT extension (e.g. "my-slug")
- * @param quality    - WebP quality 1-100, default 85
- * @returns          - Public URL string (e.g. "https://pub-xxx.r2.dev/uploads/program/my-slug.webp")
+ * @param file      - File dari FormData (umumnya sudah WebP hasil konversi browser)
+ * @param directory - Prefix folder di bucket, mis. "uploads/program"
+ * @param filename  - Nama file tanpa ekstensi, mis. "sedekah-quran"
  */
-export async function saveAsWebP(
+export async function saveImage(
     file: File,
     directory: string,
-    filename: string,
-    quality = 85
+    filename: string
 ): Promise<string> {
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const extension = EXTENSION_BY_TYPE[file.type] ?? "webp";
+    const key = `${directory}/${filename}.${extension}`;
 
-    const webpBuffer = await sharp(fileBuffer)
-        .resize({ width: 1200, withoutEnlargement: true }) // Maksimal width 1200px (tidak memperbesar jika gambar aslinya sudah kecil)
-        .webp({ quality })
-        .toBuffer();
-
-    const s3Key = `${directory}/${filename}.webp`;
-
-    await s3Client.send(
+    await getS3Client().send(
         new PutObjectCommand({
-            Bucket: import.meta.env.S3_BUCKET_NAME || process.env.S3_BUCKET_NAME,
-            Key: s3Key,
-            Body: webpBuffer,
-            ContentType: "image/webp",
+            Bucket: getBucketName(),
+            Key: key,
+            Body: new Uint8Array(await file.arrayBuffer()),
+            ContentType: file.type || "image/webp",
         })
     );
 
-    const publicUrl = (import.meta.env.S3_PUBLIC_URL || process.env.S3_PUBLIC_URL)?.replace(/\/$/, "");
-    return `${publicUrl}/${s3Key}`;
+    return `${getPublicUrl()}/${key}`;
 }
 
 /**
- * Delete an image gracefully.
- * Handles both local paths (for backwards compatibility with old entities) and S3 public URLs.
+ * Hapus gambar dari R2.
+ * URL yang tidak berada di dalam bucket publik akan diabaikan.
  */
 export async function deleteImage(imageUrl: string): Promise<void> {
-    const publicUrl = (import.meta.env.S3_PUBLIC_URL || process.env.S3_PUBLIC_URL)?.replace(/\/$/, "");
+    const publicUrl = getPublicUrl();
+    if (!publicUrl || !imageUrl.startsWith(`${publicUrl}/`)) return;
 
-    if (publicUrl && imageUrl.startsWith(publicUrl)) {
-        // It's an S3 image
-        const key = imageUrl.replace(`${publicUrl}/`, "");
-        try {
-            await s3Client.send(
-                new DeleteObjectCommand({
-                    Bucket: import.meta.env.S3_BUCKET_NAME || process.env.S3_BUCKET_NAME,
-                    Key: key,
-                })
-            );
-        } catch (e) {
-            console.error(`[S3 Delete] Failed to delete image ${key}:`, e);
-        }
-    } else {
-        // Fallback: It's an old local image (e.g. /uploads/programs/xxx.webp)
-        const oldPath = path.join(process.cwd(), "public", imageUrl);
-        try {
-            await fs.unlink(oldPath);
-        } catch (e) {
-            console.warn(`[Local Delete] Failed to delete local image ${oldPath}:`, e);
-        }
-    }
-}
+    const key = imageUrl.slice(publicUrl.length + 1);
 
-/**
- * Delete an uploads subfolder locally (e.g. for backward compatibility).
- * Silently ignores errors (folder may not exist).
- */
-export async function deleteUploadsFolder(folderPath: string): Promise<void> {
     try {
-        await fs.rm(folderPath, { recursive: true, force: true });
-    } catch {
-        // silently ignore
+        await getS3Client().send(
+            new DeleteObjectCommand({
+                Bucket: getBucketName(),
+                Key: key,
+            })
+        );
+    } catch (e) {
+        console.error(`[S3 Delete] Gagal menghapus ${key}:`, e);
     }
 }

@@ -52,11 +52,11 @@ export const PUT: APIRoute = async ({ params, request }) => {
                     await deleteImage(programData.image);
                 }
 
-                // 3. Save New Image
+                // 3. Save New Image (sudah WebP dari browser)
                 const finalSlug = body.slug || programData.slug;
-                const { saveAsWebP } = await import("../../../lib/image");
+                const { saveImage } = await import("../../../lib/image");
                 const programDir = "uploads/program";
-                body.image = await saveAsWebP(imageFile, programDir, finalSlug);
+                body.image = await saveImage(imageFile, programDir, finalSlug);
             }
         } else {
             body = (await request.json()) as UpdateProgramDto;

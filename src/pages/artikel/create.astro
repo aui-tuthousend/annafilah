@@ -442,6 +442,8 @@ const categories = [
 </style>
 
 <script>
+    import { convertToWebP } from "../../lib/client-webp";
+
     const titleInput = document.getElementById("title") as HTMLInputElement;
     const titleCount = document.getElementById("title-count");
     const excerptEl = document.getElementById("excerpt") as HTMLTextAreaElement;
@@ -629,7 +631,8 @@ const categories = [
         payload.append("content", (raw.get("content") as string).trim());
         payload.append("tags", JSON.stringify(tags));
         payload.append("isPublished", "true");
-        payload.append("image", selectedFile);
+        // Konversi ke WebP di browser (Workers tidak punya sharp)
+        payload.append("image", await convertToWebP(selectedFile));
 
         try {
             const res = await fetch("/api/artikel", {

@@ -4,8 +4,7 @@
 import type { APIRoute } from "astro";
 import { getAllArticles, createArticle } from "../../artikel/_api/repository";
 import type { ListArticleQuery } from "../../artikel/_api/types";
-import { saveAsWebP } from "../../../lib/image";
-import path from "node:path";
+import { saveImage } from "../../../lib/image";
 
 export const prerender = false;
 
@@ -74,9 +73,9 @@ export const POST: APIRoute = async ({ request }) => {
             );
         }
 
-        // Save thumbnail as WebP directly to S3 → uploads/artikel/{slug}
+        // Gambar sudah dikonversi ke WebP di browser → simpan ke R2
         const uploadsDir = "uploads/artikel";
-        const imageUrl = await saveAsWebP(validImage, uploadsDir, slug);
+        const imageUrl = await saveImage(validImage, uploadsDir, slug);
 
         const data = await createArticle({
             slug, title, excerpt, content, category, author,

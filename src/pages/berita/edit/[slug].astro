@@ -464,6 +464,8 @@ const categories = [
 </style>
 
 <script>
+    import { convertAllToWebP } from "../../../lib/client-webp";
+
     const form = document.getElementById("edit-berita-form") as HTMLFormElement;
     const alertEl = document.getElementById("form-alert");
     const submitBtn = document.getElementById(
@@ -660,12 +662,12 @@ const categories = [
                 payload.append("keep_images", i.url);
             });
 
-        // Add new images to upload
-        galleryItems
-            .filter((i) => !i.isExisting)
-            .forEach((i) => {
-                if (i.file) payload.append("new_images", i.file);
-            });
+        // Add new images to upload — konversi ke WebP di browser (Workers tidak punya sharp)
+        const newImageFiles = galleryItems
+            .filter((i) => !i.isExisting && i.file)
+            .map((i) => i.file as File);
+        const webpNewImages = await convertAllToWebP(newImageFiles);
+        webpNewImages.forEach((file) => payload.append("new_images", file));
 
         try {
             const res = await fetch(`/api/berita/${newsId}`, {

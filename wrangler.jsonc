@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "annafilah",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2026-10-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  // Pooling koneksi Postgres (Supabase) di edge.
+  // Ganti `id` dengan ID Hyperdrive milikmu: `npx wrangler hyperdrive list`
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "GANTI_DENGAN_ID_HYPERDRIVE"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

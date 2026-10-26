@@ -4,8 +4,7 @@
 import type { APIRoute } from "astro";
 import { getAllPrograms, createProgram } from "../../program/_api/repository";
 import type { ListProgramQuery } from "../../program/_api/types";
-import { saveAsWebP } from "../../../lib/image";
-import path from "node:path";
+import { saveImage } from "../../../lib/image";
 
 export const prerender = false;
 
@@ -60,9 +59,9 @@ export const POST: APIRoute = async ({ request }) => {
             );
         }
 
-        // Save image as WebP directly to S3 → uploads/program/{slug}.webp
+        // Gambar sudah dikonversi ke WebP di browser → simpan ke R2
         const uploadsDir = "uploads/program";
-        const imageUrl = await saveAsWebP(validImage, uploadsDir, slug);
+        const imageUrl = await saveImage(validImage, uploadsDir, slug);
 
         const data = await createProgram({ slug, name, image: imageUrl, description, isPublished });
 

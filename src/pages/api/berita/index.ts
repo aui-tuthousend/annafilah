@@ -4,8 +4,7 @@
 import type { APIRoute } from "astro";
 import { getAllNews, createNews, addNewsImages } from "../../berita/_api/repository";
 import type { ListNewsQuery } from "../../berita/_api/types";
-import { saveAsWebP } from "../../../lib/image";
-import path from "node:path";
+import { saveImage } from "../../../lib/image";
 
 export const prerender = false;
 
@@ -66,14 +65,14 @@ export const POST: APIRoute = async ({ request }) => {
             );
         }
 
-        // Save images as WebP directly to S3 → uploads/news/{slug}
-        // cover.webp = first image, image-2.webp, image-3.webp, ...
+        // Gambar sudah dikonversi ke WebP di browser → simpan ke R2
+        // cover.webp = gambar pertama, image-2.webp, image-3.webp, ...
         const newsDir = `uploads/news/${slug}`;
         const savedUrls: string[] = [];
 
         for (let i = 0; i < validImages.length; i++) {
             const filename = i === 0 ? "cover" : `image-${i + 1}`;
-            const url = await saveAsWebP(validImages[i], newsDir, filename);
+            const url = await saveImage(validImages[i], newsDir, filename);
             savedUrls.push(url);
         }
 

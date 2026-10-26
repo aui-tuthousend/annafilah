@@ -5,6 +5,7 @@
 
 import { defineMiddleware } from "astro:middleware";
 import { validateSession, SESSION_COOKIE } from "./lib/auth";
+import { setRuntimeEnv } from "./lib/runtime-env";
 
 // ── Path halaman UI yang membutuhkan login ────────────────────────────────────
 const PROTECTED_PAGE_PREFIXES = [
@@ -25,6 +26,11 @@ const PROTECTED_API_PREFIXES = [
 ];
 
 export const onRequest = defineMiddleware(async (context, next) => {
+    // ── Simpan env runtime Cloudflare lebih dulu ──────────────────────────────
+    // Binding Hyperdrive & secret hanya ada di sini, dan dipakai oleh `db`
+    // (src/db/index.ts) serta helper R2 (src/lib/image.ts) saat request berjalan.
+    setRuntimeEnv(context.locals.runtime?.env);
+
     const { url, request, cookies, redirect } = context;
     const pathname = url.pathname;
     const method = request.method.toUpperCase();

@@ -243,6 +243,8 @@ if (!program) {
 </style>
 
 <script>
+    import { convertToWebP } from "../../../lib/client-webp";
+
     const form = document.getElementById(
         "edit-program-form",
     ) as HTMLFormElement;
@@ -325,7 +327,8 @@ if (!program) {
         );
 
         if (selectedFile) {
-            payload.append("image", selectedFile);
+            // Konversi ke WebP di browser (Workers tidak punya sharp)
+            payload.append("image", await convertToWebP(selectedFile));
         }
 
         try {

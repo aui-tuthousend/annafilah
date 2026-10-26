@@ -292,6 +292,8 @@ const _user = Astro.locals.username;
 </style>
 
 <script>
+    import { convertToWebP } from "../../lib/client-webp";
+
     const nameInput = document.getElementById("name") as HTMLInputElement;
     const nameCount = document.getElementById("name-count");
     const imgInput = document.getElementById("image") as HTMLInputElement;
@@ -421,7 +423,8 @@ const _user = Astro.locals.username;
             (raw.get("description") as string).trim(),
         );
         payload.append("isPublished", "true");
-        payload.append("image", selectedFile);
+        // Konversi ke WebP di browser (Workers tidak punya sharp)
+        payload.append("image", await convertToWebP(selectedFile));
 
         submitBtn.disabled = true;
         if (submitText) submitText.textContent = "Menyimpan...";

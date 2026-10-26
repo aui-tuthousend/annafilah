@@ -1,0 +1,21 @@
+# Copy file ini ke .dev.vars lalu isi nilainya.
+# Dipakai oleh `wrangler dev` dan `astro dev` (via platformProxy).
+#
+# Catatan: jangan isi .env dan .dev.vars bersamaan — pilih salah satu.
+# Di produksi nilai-nilai ini disimpan sebagai secret:
+#   npx wrangler secret put SESSION_SECRET
+#   npx wrangler secret put S3_ACCESS_KEY
+#   ... (ulangi untuk secret lainnya)
+#
+# DATABASE_URL hanya untuk dev lokal. Di produksi pakai binding Hyperdrive
+# yang dideklarasikan di wrangler.jsonc.
+
+DATABASE_URL=postgresql://postgres:password@localhost:5432/annafilah
+SESSION_SECRET=ganti-dengan-string-acak-panjang
+
+S3_REGION=auto
+S3_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+S3_ACCESS_KEY=
+S3_SECRET_KEY=
+S3_BUCKET_NAME=annafilah
+S3_PUBLIC_URL=https://media.annafilah.id

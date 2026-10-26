@@ -416,6 +416,8 @@ const categories = [
 </style>
 
 <script>
+    import { convertAllToWebP } from "../../lib/client-webp";
+
     // ── Load programs into dropdown ────────────────────────────────────────────
     const programSelect = document.getElementById(
         "programId",
@@ -652,7 +654,9 @@ const categories = [
                 : "true",
         );
         // Append all images in order — server uses index 0 as cover
-        selectedFiles.forEach((file) => payload.append("images", file));
+        // Konversi semua ke WebP di browser (Workers tidak punya sharp)
+        const webpFiles = await convertAllToWebP(selectedFiles);
+        webpFiles.forEach((file) => payload.append("images", file));
 
         submitBtn.disabled = true;
         if (submitText) submitText.textContent = "Menyimpan...";
